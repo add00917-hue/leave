@@ -36,11 +36,11 @@ input,select,textarea{font-family:inherit}
 .login .glow{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5}
 .login .glow.y{width:240px;height:240px;background:rgba(255,197,46,.35);top:-60px;right:-50px}
 .login .glow.b{width:300px;height:300px;background:rgba(61,107,176,.5);bottom:-90px;left:-70px}
-.login-inner{position:relative;z-index:2}
-.lg-mark{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--yellow-bright),var(--yellow-dark));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:22px;color:var(--navy-deep);box-shadow:0 12px 30px rgba(255,180,20,.4);margin-bottom:24px}
+.login-inner{position:relative;z-index:2;text-align:center}
+.lg-mark{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--yellow-bright),var(--yellow-dark));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:22px;color:var(--navy-deep);box-shadow:0 12px 30px rgba(255,180,20,.4);margin:0 auto 24px}
 .lg-word{font-family:var(--mono);font-weight:600;font-size:40px;letter-spacing:1px;line-height:1}.lg-word .ac{color:var(--yellow-bright)}
 .lg-sub{font-size:14px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.5}
-.lg-form{margin-top:34px;display:flex;flex-direction:column;gap:14px}
+.lg-form{margin-top:34px;display:flex;flex-direction:column;gap:14px;text-align:left}
 .lg-field label{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;display:block;margin-bottom:7px}
 .lg-field input{width:100%;padding:15px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-size:15px;outline:none;transition:.16s}
 .lg-field input:focus{border-color:var(--yellow);background:rgba(255,255,255,.12)}
@@ -48,7 +48,9 @@ input,select,textarea{font-family:inherit}
 .lg-btn{margin-top:8px;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--yellow-bright),var(--yellow-dark));color:var(--navy-deep);font-size:16px;font-weight:700;box-shadow:0 10px 26px rgba(255,180,20,.36);display:flex;align-items:center;justify-content:center;gap:9px;transition:.14s}
 .lg-btn:active{transform:scale(.98)}
 .lg-btn svg{width:21px;height:21px;flex-shrink:0}
-.lg-hint{margin-top:18px;font-size:11.5px;color:rgba(255,255,255,.5);text-align:center;line-height:1.6}
+.lg-status{font-size:12.5px;margin-top:12px;text-align:center;min-height:16px;font-weight:600}
+.lg-status.err{color:#FCA5A5}.lg-status.wait{color:#FCD34D}
+.lg-hint{margin-top:14px;font-size:11.5px;color:rgba(255,255,255,.5);text-align:center;line-height:1.6}
 .lg-foot{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:10.5px;color:rgba(255,255,255,.35);font-family:var(--mono);z-index:2}
 
 /* ===== APP HEADER ===== */
@@ -68,6 +70,12 @@ input,select,textarea{font-family:inherit}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 .qstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px}
+.db-bar{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:14px;font-size:12.5px;font-weight:600;margin-bottom:15px}
+.db-bar .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.db-bar.wait{background:var(--warning-bg);color:#B47400}.db-bar.wait .dot{background:var(--warning);animation:pulse 1.4s infinite}
+.db-bar.on{background:var(--success-bg);color:#0B7A55}.db-bar.on .dot{background:var(--success)}
+.db-bar.off{background:#FDECEC;color:#C0392B}.db-bar.off .dot{background:var(--danger)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .qstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 12px;text-align:center;box-shadow:0 2px 8px rgba(10,35,66,.05)}
 .qstat b{font-family:var(--mono);font-size:24px;font-weight:600;display:block;line-height:1}
 .qstat span{font-size:11px;color:var(--ink-soft);margin-top:5px;display:block}
@@ -190,10 +198,11 @@ input,select,textarea{font-family:inherit}
       <div class="lg-word">GN<span class="ac">R3</span></div>
       <div class="lg-sub">Plans &amp; activities of the GNR3 team<br>แอปสมาชิก — บันทึกแผนงานและกิจกรรม</div>
       <div class="lg-form">
-        <div class="lg-field"><label>ชื่อผู้ใช้ (Username)</label><input id="lg-user" value="thanapat" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <div class="lg-field"><label>รหัสผ่าน (Password)</label><input id="lg-pass" type="password" value="gnr3@123" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="lg-field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="lg-user" placeholder="กรอกชื่อผู้ใช้งาน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div class="lg-field"><label>รหัสผ่าน (Password)</label><input id="lg-pass" type="password" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <button class="lg-btn" onclick="doLogin()">เข้าสู่ระบบ
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        <div class="lg-status" id="lg-status"></div>
         <div class="lg-hint">ตัวอย่างเข้าใช้: <b>thanapat</b> / gnr3@123 (สมาชิก)<br>หรือ <b>admin</b> / gnr3@admin (ผู้ดูแล)</div>
       </div>
     </div>
@@ -234,7 +243,7 @@ input,select,textarea{font-family:inherit}
 
 <script>
 /* ===== Plans & Activities of the GNR3 team — Mobile ===== */
-const CONFIG={SHEETS_API_URL:'',MOBILE_APP_URL:'https://gnr3.app/team'};
+const CONFIG={SHEETS_API_URL:'https://script.google.com/macros/s/AKfycbxZvs3i43dDyMg3WR4roE9bWml-PAqHVXoMCoTlfNXpEBHMeCgB-3mAcsi0zE6XiwGB/exec',MOBILE_APP_URL:'https://gnr3.app/team'};
 const CAT={
   sick:{g:'leave',th:'ลาป่วย',c:'#EF4444',approve:true},
   personal:{g:'leave',th:'ลากิจ',c:'#6366F1',approve:true},
@@ -285,7 +294,10 @@ const employees=[
 ];
 const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
-function avaColor(id){let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
+function avaColor(id){id=id||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
+let _profPhoto='';
+function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
+function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
 const initial=n=>(n||'?').trim().charAt(0);
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
@@ -321,17 +333,35 @@ let holidays=[
 const holiName=ds=>{const h=holidays.find(x=>x.date===ds);return h?h.name:'';};
 
 /* ===== AUTH ===== */
-function doLogin(){
-  const u=document.getElementById('lg-user').value.trim(), p=document.getElementById('lg-pass').value;
-  const found=employees.find(e=>e.user===u&&e.pass===p);
-  if(!found){toast('username หรือ password ไม่ถูกต้อง','err');return;}
-  CUR=found;
+function lgBusy(b){const btn=document.querySelector('.lg-btn');if(btn){btn.style.opacity=b?'.6':'1';btn.style.pointerEvents=b?'none':'auto';}}
+function lgStatus(msg,kind){const el=document.getElementById('lg-status');if(el){el.textContent=msg||'';el.className='lg-status '+(kind||'');}}
+function enterAppUI(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  document.getElementById('ab-ava').textContent=initial(CUR.name);
-  document.getElementById('ab-ava').style.background=avaColor(CUR.id);
-  document.getElementById('ab-name').textContent=CUR.name.split(' ')[0];
+  setAva('ab-ava',CUR);
+  document.getElementById('ab-name').textContent=CUR.name?CUR.name.split(' ')[0]:CUR.user;
   nav('home');
+}
+async function doLogin(){
+  const u=(document.getElementById('lg-user').value||'').trim();
+  const p=document.getElementById('lg-pass').value||'';
+  if(!u||!p){lgStatus('กรุณากรอกชื่อผู้ใช้งานและรหัสผ่าน','err');return;}
+  lgBusy(true);lgStatus('กำลังเชื่อมต่อฐานข้อมูล...','wait');
+  if(CONFIG.SHEETS_API_URL){
+    try{
+      const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',username:u,password:p})});
+      const j=await res.json();
+      if(j&&j.ok&&j.data&&j.data.emp_id){
+        CUR={id:j.data.emp_id,name:j.data.full_name,dept:j.data.dept,pos:j.data.position,role:j.data.role||'user',user:j.data.username||u,pass:p,photo:j.data.photo||''};
+        DBS='online';lgBusy(false);lgStatus('');enterAppUI();syncDBm();return;
+      }
+      if(j&&j.ok===false){lgBusy(false);lgStatus(j.error||'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง','err');return;}
+    }catch(e){/* ต่อ DB ไม่ได้ → ใช้โหมดออฟไลน์ */}
+  }
+  const found=employees.find(e=>e.user===u&&e.pass===p);
+  if(!found){lgBusy(false);lgStatus('เชื่อมต่อฐานข้อมูลไม่ได้ และข้อมูลเข้าสู่ระบบไม่ถูกต้อง','err');return;}
+  CUR=Object.assign({photo:''},found);DBS='offline';lgBusy(false);lgStatus('');enterAppUI();
+  toast('ออฟไลน์ • เข้าสู่ระบบด้วยข้อมูลตัวอย่าง','warn');syncDBm();
 }
 function logout(){closeSheet();document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');}
 
@@ -350,12 +380,34 @@ function nav(s){curScr=s;
 const myRecs=()=>records.filter(r=>r.emp===CUR.id);
 const recOn=ds=>records.filter(r=>r.start<=ds&&ds<=r.end);
 
+/* ---- database connection ---- */
+let DBS='connecting';
+function dbBar(){const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • ใช้ข้อมูลตัวอย่าง']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
+function setDBm(st){DBS=st;if(curScr==='home')renderHome();}
+async function syncDBm(){
+  if(!CONFIG.SHEETS_API_URL){setDBm('offline');return;}
+  setDBm('connecting');
+  try{
+    const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'bootstrap'})});
+    const j=await res.json();
+    if(j&&j.ok&&j.data){
+      const d=j.data,D=v=>(''+(v==null?'':v)).slice(0,10);
+      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:e.emp_id,name:e.full_name,dept:e.dept,pos:e.position,role:e.role||'user',user:e.username,pass:e.password_hash,photo:e.photo||''}));
+      if(Array.isArray(d.records)) records=d.records.map(r=>({id:r.record_id,emp:r.emp_id,cat:r.category,start:D(r.start_date),end:D(r.end_date||r.start_date),title:r.title,location:r.location||'',st:r.start_time||'',et:r.end_time||'',status:r.status||'none',overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:r.note||''})).filter(r=>CAT[r.cat]);
+      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:h.name,type:h.type||'public'}));
+      const meNow=employees.find(e=>e.id===CUR.id);if(meNow&&!CUR.photo)CUR.photo=meNow.photo||'';
+      setDBm('online');nav(curScr);
+    } else setDBm('offline');
+  }catch(e){ setDBm('offline'); }
+}
+
 /* ===== HOME ===== */
 function renderHome(){
   const mine=myRecs(); const pend=mine.filter(r=>r.status==='pending').length;
   const todayMine=mine.filter(r=>r.start<=TODAY&&TODAY<=r.end).length;
   const upcoming=mine.filter(r=>r.end>=TODAY).sort((a,b)=>a.start<b.start?-1:1).slice(0,4);
   document.getElementById('s-home').innerHTML=`
+  ${dbBar()}
   <div class="qstats">
     <div class="qstat"><b class="mono">${mine.length}</b><span>รายการ</span></div>
     <div class="qstat a"><b class="mono">${pend}</b><span>รออนุมัติ</span></div>
@@ -430,16 +482,47 @@ function openRec(id){const r=records.find(x=>x.id===id);
 /* ===== PROFILE ===== */
 function renderProfile(){
   document.getElementById('s-profile').innerHTML=`
-  <div class="prof-top"><div class="prof-ava" style="background:${avaColor(CUR.id)}">${initial(CUR.name)}</div>
-    <div class="prof-name">${esc(CUR.name)}</div><div class="prof-role">${esc(CUR.pos)} • ${esc(CUR.dept)}</div></div>
+  <div class="prof-top"><div class="prof-ava" style="background:${avaColor(CUR.id)};overflow:hidden">${CUR.photo?`<img src="${CUR.photo}" style="width:100%;height:100%;object-fit:cover">`:initial(CUR.name)}</div>
+    <div class="prof-name">${esc(CUR.name)}</div><div class="prof-role">${esc(CUR.pos)} • ${esc(CUR.dept)}</div>
+    <button class="chip on" style="margin-top:14px;background:var(--navy);color:#fff;border-color:var(--navy)" onclick="openProfileEdit()">${I.user} แก้ไขโปรไฟล์</button></div>
   <div class="prof-list">
-    <div class="prof-row"><div class="ic">${I.user}</div><div><div class="l">${esc(CUR.id)}</div><div class="v">รหัสสมาชิก</div></div></div>
+    <div class="prof-row"><div class="ic">${I.user}</div><div><div class="l">@${esc(CUR.user)}</div><div class="v">ชื่อผู้ใช้งาน</div></div></div>
+    <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${esc(CUR.id)}</div><div class="v">รหัสสมาชิก</div></div></div>
     <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${({user:'ผู้ใช้ทั่วไป',approver:'ผู้อนุมัติ',admin:'ผู้ดูแลระบบ'})[CUR.role]}</div><div class="v">สิทธิ์การใช้งาน</div></div></div>
     <div class="prof-row"><div class="ic">${I.line}</div><div><div class="l">เชื่อมต่อ LINE</div><div class="v">รับการแจ้งเตือน</div></div><div class="tg on" style="margin-left:auto" onclick="this.classList.toggle('on')"></div></div>
     <div class="prof-row" onclick="openHolidays()"><div class="ic" style="background:#FDECEC;color:#C0392B">${I.cal}</div><div><div class="l">วันหยุดบริษัท</div><div class="v">${holidays.length} วันในปีนี้</div></div><div class="ar">${I.ar}</div></div>
   </div>
   <button class="logout" onclick="logout()">${I.out} ออกจากระบบ</button>
   <div style="text-align:center;font-size:11px;color:var(--ink-soft);margin-top:18px;font-family:var(--mono)">GNR3 Team Plans v1.0 • OPS-BSCS</div>`;
+}
+
+/* ===== แก้ไขโปรไฟล์ (พนักงานทำเอง) ===== */
+function openProfileEdit(){
+  _profPhoto=CUR.photo||'';
+  openSheet('แก้ไขโปรไฟล์',`
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
+      <div id="pf-ava" style="width:92px;height:92px;border-radius:28px;background:${avaColor(CUR.id)};display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;color:#fff;font-weight:600">${_profPhoto?`<img src="${_profPhoto}" style="width:100%;height:100%;object-fit:cover">`:initial(CUR.name)}</div>
+      <button class="chip" style="margin-top:12px" onclick="pickPhoto(function(d){_profPhoto=d;document.getElementById('pf-ava').innerHTML='<img src=\''+d+'\' style=\'width:100%;height:100%;object-fit:cover\'>';})">เปลี่ยนรูปโปรไฟล์</button>
+    </div>
+    <div class="field"><label>ชื่อ-นามสกุล</label><input id="pf-name" value="${esc(CUR.name)}"></div>
+    <div class="field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="pf-user" class="mono" value="${esc(CUR.user)}"></div>
+    <div class="field"><label>รหัสผ่านใหม่</label><input id="pf-pass" type="password" placeholder="เว้นว่างไว้ถ้าไม่เปลี่ยน"></div>
+    <button class="submit" onclick="saveProfile()">${I.check} บันทึกโปรไฟล์</button>`);
+}
+async function saveProfile(){
+  const name=fv('pf-name').trim(),user=fv('pf-user').trim(),pass=fv('pf-pass');
+  if(!name||!user){toast('กรอกชื่อและชื่อผู้ใช้งาน','err');return;}
+  CUR.name=name;CUR.user=user;if(pass)CUR.pass=pass;CUR.photo=_profPhoto;
+  const me=employees.find(e=>e.id===CUR.id);if(me){me.name=name;me.user=user;if(pass)me.pass=pass;me.photo=_profPhoto;}
+  setAva('ab-ava',CUR);document.getElementById('ab-name').textContent=name.split(' ')[0];
+  closeSheet();nav('profile');
+  if(CONFIG.SHEETS_API_URL){
+    try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateProfile',emp_id:CUR.id,full_name:name,username:user,password:pass||'',photo:_profPhoto})});
+      const j=await res.json();
+      if(j&&j.ok){toast('บันทึกโปรไฟล์เข้าฐานข้อมูลแล้ว');}
+      else{toast(((j&&j.error)||'บันทึกลงฐานข้อมูลไม่สำเร็จ'),'warn');}
+    }catch(e){toast('ออฟไลน์ • บันทึกในเครื่องแล้ว','warn');}
+  } else { toast('บันทึกโปรไฟล์แล้ว'); }
 }
 
 /* ===== SHEETS / FORMS ===== */
