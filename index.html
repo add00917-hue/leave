@@ -214,8 +214,8 @@ input,select,textarea{font-family:inherit}
     <div class="appbar">
       <div class="bg"></div>
       <div class="ab-top">
-        <div class="ab-ava" id="ab-ava">ธ</div>
-        <div><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ธนภัทร</div></div>
+        <div class="ab-ava" id="ab-ava">?</div>
+        <div><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ผู้ใช้งาน</div></div>
         <button class="ab-bell" onclick="toast('ยังไม่มีการแจ้งเตือนใหม่')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="d"></span></button>
       </div>
       <div style="margin-top:16px"><div class="ab-title" id="scr-title">หน้าแรก</div><div class="ab-sub" id="scr-sub">ภาพรวมของฉันวันนี้</div></div>
@@ -283,7 +283,7 @@ const I={
   inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
 };
 
-const employees=[
+let employees=[
   {id:'EMP003',name:'ธนภัทร วงศ์ทอง',dept:'พัฒนา',pos:'Frontend Dev',role:'user',user:'thanapat',pass:'gnr3@123'},
   {id:'EMP001',name:'สมชาย ใจดี',dept:'ปฏิบัติการ',pos:'Ops Lead',role:'approver',user:'somchai',pass:'gnr3@123'},
   {id:'EMP004',name:'วิภาวี ศรีสุข',dept:'พัฒนา',pos:'Eng Manager',role:'approver',user:'wipawee',pass:'gnr3@123'},
@@ -294,12 +294,12 @@ const employees=[
 ];
 const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
-function avaColor(id){id=id||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
+function avaColor(id){id=String(id==null?'x':id)||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
 function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
-const initial=n=>(n||'?').trim().charAt(0);
-function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+const initial=n=>{n=String(n==null?'':n).trim();return n?n.charAt(0):'?';};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
 function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
@@ -352,7 +352,7 @@ async function doLogin(){
       const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',username:u,password:p})});
       const j=await res.json();
       if(j&&j.ok&&j.data&&j.data.emp_id){
-        CUR={id:j.data.emp_id,name:j.data.full_name,dept:j.data.dept,pos:j.data.position,role:j.data.role||'user',user:j.data.username||u,pass:p,photo:j.data.photo||''};
+        CUR={id:String(j.data.emp_id),name:String(j.data.full_name||''),dept:String(j.data.dept||''),pos:String(j.data.position||''),role:String(j.data.role||'user'),user:String(j.data.username||u),pass:p,photo:String(j.data.photo||'')};
         DBS='online';lgBusy(false);lgStatus('');enterAppUI();syncDBm();return;
       }
       if(j&&j.ok===false){lgBusy(false);lgStatus(j.error||'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง','err');return;}
@@ -392,10 +392,11 @@ async function syncDBm(){
     const j=await res.json();
     if(j&&j.ok&&j.data){
       const d=j.data,D=v=>(''+(v==null?'':v)).slice(0,10);
-      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:e.emp_id,name:e.full_name,dept:e.dept,pos:e.position,role:e.role||'user',user:e.username,pass:e.password_hash,photo:e.photo||''}));
-      if(Array.isArray(d.records)) records=d.records.map(r=>({id:r.record_id,emp:r.emp_id,cat:r.category,start:D(r.start_date),end:D(r.end_date||r.start_date),title:r.title,location:r.location||'',st:r.start_time||'',et:r.end_time||'',status:r.status||'none',overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:r.note||''})).filter(r=>CAT[r.cat]);
-      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:h.name,type:h.type||'public'}));
-      const meNow=employees.find(e=>e.id===CUR.id);if(meNow&&!CUR.photo)CUR.photo=meNow.photo||'';
+      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:String(e.emp_id==null?'':e.emp_id),name:String(e.full_name==null?'':e.full_name),dept:String(e.dept==null?'':e.dept),pos:String(e.position==null?'':e.position),role:String(e.role||'user'),user:String(e.username==null?'':e.username),pass:String(e.password_hash==null?'':e.password_hash),photo:String(e.photo||'')})).filter(e=>e.id);
+      if(Array.isArray(d.records)) records=d.records.map(r=>({id:String(r.record_id==null?'':r.record_id),emp:String(r.emp_id==null?'':r.emp_id),cat:String(r.category||''),start:D(r.start_date),end:D(r.end_date||r.start_date),title:String(r.title==null?'':r.title),location:String(r.location||''),st:String(r.start_time||''),et:String(r.end_time||''),status:String(r.status||'none'),overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:String(r.note||'')})).filter(r=>CAT[r.cat]);
+      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:String(h.name==null?'':h.name),type:String(h.type||'public')})).filter(h=>/^\d{4}-\d{2}-\d{2}$/.test(h.date));
+      const meNow=employees.find(e=>String(e.id)===String(CUR.id));
+      if(meNow){CUR.name=meNow.name||CUR.name;CUR.dept=meNow.dept||CUR.dept;CUR.pos=meNow.pos||CUR.pos;CUR.role=meNow.role||CUR.role;if(meNow.photo)CUR.photo=meNow.photo;setAva('ab-ava',CUR);document.getElementById('ab-name').textContent=(CUR.name||CUR.user||'').split(' ')[0];}
       setDBm('online');nav(curScr);
     } else setDBm('offline');
   }catch(e){ setDBm('offline'); }
@@ -488,7 +489,7 @@ function renderProfile(){
   <div class="prof-list">
     <div class="prof-row"><div class="ic">${I.user}</div><div><div class="l">@${esc(CUR.user)}</div><div class="v">ชื่อผู้ใช้งาน</div></div></div>
     <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${esc(CUR.id)}</div><div class="v">รหัสสมาชิก</div></div></div>
-    <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${({user:'ผู้ใช้ทั่วไป',approver:'ผู้อนุมัติ',admin:'ผู้ดูแลระบบ'})[CUR.role]}</div><div class="v">สิทธิ์การใช้งาน</div></div></div>
+    <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${({user:'ผู้ใช้ทั่วไป',approver:'ผู้อนุมัติ',admin:'ผู้ดูแลระบบ'})[CUR.role]||'ผู้ใช้ทั่วไป'}</div><div class="v">สิทธิ์การใช้งาน</div></div></div>
     <div class="prof-row"><div class="ic">${I.line}</div><div><div class="l">เชื่อมต่อ LINE</div><div class="v">รับการแจ้งเตือน</div></div><div class="tg on" style="margin-left:auto" onclick="this.classList.toggle('on')"></div></div>
     <div class="prof-row" onclick="openHolidays()"><div class="ic" style="background:#FDECEC;color:#C0392B">${I.cal}</div><div><div class="l">วันหยุดบริษัท</div><div class="v">${holidays.length} วันในปีนี้</div></div><div class="ar">${I.ar}</div></div>
   </div>
