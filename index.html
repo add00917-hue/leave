@@ -545,10 +545,20 @@ function openPicker(){
 function pick(type,c,icon,t,s){return `<button class="pick" style="width:100%;text-align:left" onclick="openForm('${type}')"><div class="ic" style="background:${c}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div><div class="ar">${I.ar}</div></button>`;}
 
 let formType='sick';
+function isManager(){return CUR.role==='admin'||CUR.role==='approver';}
+function empOptM(sel){return employees.filter(e=>!e.status||e.status==='active').map(e=>`<option value="${e.id}" ${String(e.id)===String(sel)?'selected':''}>${esc(e.name)} (${e.id})</option>`).join('');}
+function onBehalfField(){return isManager()?`<div class="field"><label>บันทึกในนามของ</label><select id="f-emp">${empOptM(CUR.id)}</select></div>`:'';}
+function formEmp(){const el=document.getElementById('f-emp');return el?el.value:CUR.id;}
+async function saveRecordDB(rec){
+  if(!CONFIG.SHEETS_API_URL)return;
+  try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'createRecord',emp_id:rec.emp,category:rec.cat,start_date:rec.start,end_date:rec.end,start_time:rec.st,end_time:rec.et,title:rec.title,location:rec.location,overnight:rec.overnight,cost:rec.cost,note:rec.note})});}catch(e){}
+}
+function behalfToast(rec,msg){const other=String(rec.emp)!==String(CUR.id);toast(other?('บันทึกในนามของ '+esc(emp(rec.emp).name)+' แล้ว'):msg);}
 function openForm(group){
   const today=TODAY;
   if(group==='leave'){formType='sick';
     openSheet('แจ้งลา',`
+      ${onBehalfField()}
       <div class="field"><label>ประเภทการลา</label><div class="type-grid" id="type-grid">
         ${['sick','personal','other','vacation'].map(k=>typeOpt(k)).join('')}</div></div>
       <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
@@ -556,6 +566,7 @@ function openForm(group){
       ${submitBtn('submitLeave()')}`);
   } else if(group==='training'){formType='internal';
     openSheet('อบรม / กิจกรรม',`
+      ${onBehalfField()}
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['internal','esv','event'].map(k=>typeOpt(k)).join('')}</div></div>
       <div class="field"><label>ชื่อหัวข้อ / กิจกรรม</label><input id="f-title" placeholder="เช่น อบรม Security ภายใน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น ห้องประชุม A / ศูนย์ ESV"></div>
@@ -565,6 +576,7 @@ function openForm(group){
   } else { // overtime or offsite
     formType=group;
     openSheet(group==='overtime'?'ทำงานล่วงเวลา (OT)':'งานนอกสถานที่',`
+      ${onBehalfField()}
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['overtime','offsite'].map(k=>typeOpt(k,'otToggle')).join('')}</div></div>
       <div class="field"><label>ชื่องาน</label><input id="f-title" placeholder="เช่น ปิดยอดสิ้นเดือน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น สำนักงาน / ชลบุรี"></div>
@@ -585,16 +597,16 @@ function submitBtn(fn){return `<button class="submit" onclick="${fn}">${I.check}
 const fv=id=>{const e=document.getElementById(id);return e?e.value:'';};
 
 function submitLeave(){const cat=formType;
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'}));
-  closeSheet();nav(curScr);toast(CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
+  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'});
+  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
 function submitTrain(){const cat=formType;
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),status:CAT[cat].approve?'pending':'none'}));
-  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว');}
+  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),status:CAT[cat].approve?'pending':'none'});
+  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,'บันทึกรายการแล้ว');}
 function submitOT(){const cat=formType;const off=cat==='offsite';
   const overnight=off&&document.getElementById('f-overnight').classList.contains('on');
   const hasCost=off&&document.getElementById('f-hascost').classList.contains('on');
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),overnight,cost:hasCost?Number(fv('f-cost')||0):null,status:'pending'}));
-  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว รออนุมัติ');}
+  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),overnight,cost:hasCost?Number(fv('f-cost')||0):null,status:'pending'});
+  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,'บันทึกรายการแล้ว รออนุมัติ');}
 
 function openHolidays(){
   const sorted=[...holidays].sort((a,b)=>a.date<b.date?-1:1); const byM={};
