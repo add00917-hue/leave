@@ -296,7 +296,20 @@ const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
 function avaColor(id){id=String(id==null?'x':id)||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
-function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
+function pickPhoto(cb){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
+  function cleanup(){try{if(inp.parentNode)inp.parentNode.removeChild(inp);}catch(e){}}
+  inp.onchange=function(){const f=inp.files&&inp.files[0];if(!f){cleanup();return;}
+    const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){
+      const S=150,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+      try{cb(c.toDataURL('image/jpeg',0.62));}finally{cleanup();}
+    };img.onerror=cleanup;img.src=rd.result;};rd.onerror=cleanup;rd.readAsDataURL(f);};
+  document.body.appendChild(inp);inp.click();
+  const rm=function(){setTimeout(cleanup,400);window.removeEventListener('focus',rm);};
+  window.addEventListener('focus',rm);
+}
 function pickProfilePhoto(){pickPhoto(function(d){_profPhoto=d;const el=document.getElementById('pf-ava');if(el)el.innerHTML='<img src="'+d+'" style="width:100%;height:100%;object-fit:cover">';});}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
 const initial=n=>{n=String(n==null?'':n).trim();return n?n.charAt(0):'?';};
@@ -519,11 +532,18 @@ async function saveProfile(){
   setAva('ab-ava',CUR);document.getElementById('ab-name').textContent=name.split(' ')[0];
   closeSheet();nav('profile');
   if(CONFIG.SHEETS_API_URL){
-    try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateProfile',emp_id:CUR.id,full_name:name,username:user,password:pass||'',photo:_profPhoto})});
+    const AP=CONFIG.SHEETS_API_URL, HD={'Content-Type':'text/plain;charset=utf-8'};
+    try{const res=await fetch(AP,{method:'POST',headers:HD,body:JSON.stringify({action:'updateProfile',emp_id:CUR.id,full_name:name,username:user,password:pass||'',photo:_profPhoto})});
       const j=await res.json();
-      if(j&&j.ok){toast('บันทึกโปรไฟล์เข้าฐานข้อมูลแล้ว');}
+      if(j&&j.ok){
+        let confirmed=false,hasPhoto=false;
+        try{const c=await fetch(AP,{method:'POST',headers:HD,body:JSON.stringify({action:'photoStatus',emp_id:CUR.id})});const cj=await c.json();if(cj&&cj.ok&&cj.data){confirmed=true;hasPhoto=!!cj.data.hasPhoto;}}catch(e){}
+        if(confirmed){ if(!_profPhoto||hasPhoto) toast('✓ ยืนยันแล้ว: บันทึกลงฐานข้อมูล'+(_profPhoto?' พร้อมรูป':'')+' • เปิดเครื่องอื่นเห็นได้');
+          else toast('บันทึกแล้ว แต่ยังไม่พบรูปในฐานข้อมูล — โปรด Deploy Apps Script ใหม่','warn'); }
+        else toast('⚠ บันทึกแล้ว แต่ยืนยันรูปไม่ได้ — โค้ดที่ Deploy เป็นเวอร์ชันเก่า โปรด Deploy เวอร์ชันใหม่','warn');
+      }
       else{toast(((j&&j.error)||'บันทึกลงฐานข้อมูลไม่สำเร็จ'),'warn');}
-    }catch(e){toast('ออฟไลน์ • บันทึกในเครื่องแล้ว','warn');}
+    }catch(e){toast('ออฟไลน์ • บันทึกในเครื่องเท่านั้น (เครื่องอื่นยังไม่เห็น)','warn');}
   } else { toast('บันทึกโปรไฟล์แล้ว'); }
 }
 
