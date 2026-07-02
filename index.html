@@ -203,7 +203,7 @@ input,select,textarea{font-family:inherit}
         <button class="lg-btn" onclick="doLogin()">เข้าสู่ระบบ
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
         <div class="lg-status" id="lg-status"></div>
-        <div class="lg-hint">ตัวอย่างเข้าใช้: <b>thanapat</b> / gnr3@123 (สมาชิก)<br>หรือ <b>admin</b> / gnr3@admin (ผู้ดูแล)</div>
+        <div class="lg-hint">Plans and activities of the GNR3 team. • OPS-BSCS • © 2026</div>
       </div>
     </div>
     <div class="lg-foot">OPS-BSCS • © 2026</div>
@@ -243,7 +243,7 @@ input,select,textarea{font-family:inherit}
 
 <script>
 /* ===== Plans & Activities of the GNR3 team — Mobile ===== */
-const CONFIG={SHEETS_API_URL:'https://script.google.com/macros/s/AKfycbxZvs3i43dDyMg3WR4roE9bWml-PAqHVXoMCoTlfNXpEBHMeCgB-3mAcsi0zE6XiwGB/exec',MOBILE_APP_URL:'https://gnr3.app/team'};
+const CONFIG={SHEETS_API_URL:'https://script.google.com/macros/s/AKfycbxZvs3i43dDyMg3WR4roE9bWml-PAqHVXoMCoTlfNXpEBHMeCgB-3mAcsi0zE6XiwGB/exec',MOBILE_APP_URL:'https://add00917-hue.github.io/leave/'};
 const CAT={
   sick:{g:'leave',th:'ลาป่วย',c:'#EF4444',approve:true},
   personal:{g:'leave',th:'ลากิจ',c:'#6366F1',approve:true},
@@ -297,6 +297,7 @@ const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488']
 function avaColor(id){id=String(id==null?'x':id)||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
 function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
+function pickProfilePhoto(){pickPhoto(function(d){_profPhoto=d;const el=document.getElementById('pf-ava');if(el)el.innerHTML='<img src="'+d+'" style="width:100%;height:100%;object-fit:cover">';});}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
 const initial=n=>{n=String(n==null?'':n).trim();return n?n.charAt(0):'?';};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -503,7 +504,7 @@ function openProfileEdit(){
   openSheet('แก้ไขโปรไฟล์',`
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
       <div id="pf-ava" style="width:92px;height:92px;border-radius:28px;background:${avaColor(CUR.id)};display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;color:#fff;font-weight:600">${_profPhoto?`<img src="${_profPhoto}" style="width:100%;height:100%;object-fit:cover">`:initial(CUR.name)}</div>
-      <button class="chip" style="margin-top:12px" onclick="pickPhoto(function(d){_profPhoto=d;document.getElementById('pf-ava').innerHTML='<img src=\''+d+'\' style=\'width:100%;height:100%;object-fit:cover\'>';})">เปลี่ยนรูปโปรไฟล์</button>
+      <button class="chip" style="margin-top:12px" onclick="pickProfilePhoto()">เปลี่ยนรูปโปรไฟล์</button>
     </div>
     <div class="field"><label>ชื่อ-นามสกุล</label><input id="pf-name" value="${esc(CUR.name)}"></div>
     <div class="field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="pf-user" class="mono" value="${esc(CUR.user)}"></div>
