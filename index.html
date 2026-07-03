@@ -203,7 +203,7 @@ input,select,textarea{font-family:inherit}
         <button class="lg-btn" onclick="doLogin()">เข้าสู่ระบบ
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
         <div class="lg-status" id="lg-status"></div>
-        <div class="lg-hint">Plans and activities of the GNR3 team. • OPS-BSCS • © 2026</div>
+        <div class="lg-hint">ตัวอย่างเข้าใช้: <b>thanapat</b> / gnr3@123 (สมาชิก)<br>หรือ <b>admin</b> / gnr3@admin (ผู้ดูแล)</div>
       </div>
     </div>
     <div class="lg-foot">OPS-BSCS • © 2026</div>
@@ -214,8 +214,8 @@ input,select,textarea{font-family:inherit}
     <div class="appbar">
       <div class="bg"></div>
       <div class="ab-top">
-        <div class="ab-ava" id="ab-ava">?</div>
-        <div><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ผู้ใช้งาน</div></div>
+        <div class="ab-ava" id="ab-ava">ธ</div>
+        <div><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ธนภัทร</div></div>
         <button class="ab-bell" onclick="toast('ยังไม่มีการแจ้งเตือนใหม่')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="d"></span></button>
       </div>
       <div style="margin-top:16px"><div class="ab-title" id="scr-title">หน้าแรก</div><div class="ab-sub" id="scr-sub">ภาพรวมของฉันวันนี้</div></div>
@@ -243,7 +243,7 @@ input,select,textarea{font-family:inherit}
 
 <script>
 /* ===== Plans & Activities of the GNR3 team — Mobile ===== */
-const CONFIG={SHEETS_API_URL:'https://script.google.com/macros/s/AKfycbxZvs3i43dDyMg3WR4roE9bWml-PAqHVXoMCoTlfNXpEBHMeCgB-3mAcsi0zE6XiwGB/exec',MOBILE_APP_URL:'https://add00917-hue.github.io/leave/'};
+const CONFIG={SHEETS_API_URL:'https://script.google.com/macros/s/AKfycbxZvs3i43dDyMg3WR4roE9bWml-PAqHVXoMCoTlfNXpEBHMeCgB-3mAcsi0zE6XiwGB/exec',MOBILE_APP_URL:'https://gnr3.app/team'};
 const CAT={
   sick:{g:'leave',th:'ลาป่วย',c:'#EF4444',approve:true},
   personal:{g:'leave',th:'ลากิจ',c:'#6366F1',approve:true},
@@ -283,7 +283,7 @@ const I={
   inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
 };
 
-let employees=[
+const employees=[
   {id:'EMP003',name:'ธนภัทร วงศ์ทอง',dept:'พัฒนา',pos:'Frontend Dev',role:'user',user:'thanapat',pass:'gnr3@123'},
   {id:'EMP001',name:'สมชาย ใจดี',dept:'ปฏิบัติการ',pos:'Ops Lead',role:'approver',user:'somchai',pass:'gnr3@123'},
   {id:'EMP004',name:'วิภาวี ศรีสุข',dept:'พัฒนา',pos:'Eng Manager',role:'approver',user:'wipawee',pass:'gnr3@123'},
@@ -294,26 +294,12 @@ let employees=[
 ];
 const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
-function avaColor(id){id=String(id==null?'x':id)||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
+function avaColor(id){id=id||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
-function pickPhoto(cb){
-  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
-  inp.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
-  function cleanup(){try{if(inp.parentNode)inp.parentNode.removeChild(inp);}catch(e){}}
-  inp.onchange=function(){const f=inp.files&&inp.files[0];if(!f){cleanup();return;}
-    const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){
-      const S=150,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);
-      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
-      try{cb(c.toDataURL('image/jpeg',0.62));}finally{cleanup();}
-    };img.onerror=cleanup;img.src=rd.result;};rd.onerror=cleanup;rd.readAsDataURL(f);};
-  document.body.appendChild(inp);inp.click();
-  const rm=function(){setTimeout(cleanup,400);window.removeEventListener('focus',rm);};
-  window.addEventListener('focus',rm);
-}
-function pickProfilePhoto(){pickPhoto(function(d){_profPhoto=d;const el=document.getElementById('pf-ava');if(el)el.innerHTML='<img src="'+d+'" style="width:100%;height:100%;object-fit:cover">';});}
+function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
-const initial=n=>{n=String(n==null?'':n).trim();return n?n.charAt(0):'?';};
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+const initial=n=>(n||'?').trim().charAt(0);
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
 function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
@@ -366,7 +352,7 @@ async function doLogin(){
       const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',username:u,password:p})});
       const j=await res.json();
       if(j&&j.ok&&j.data&&j.data.emp_id){
-        CUR={id:String(j.data.emp_id),name:String(j.data.full_name||''),dept:String(j.data.dept||''),pos:String(j.data.position||''),role:String(j.data.role||'user'),user:String(j.data.username||u),pass:p,photo:String(j.data.photo||'')};
+        CUR={id:j.data.emp_id,name:j.data.full_name,dept:j.data.dept,pos:j.data.position,role:j.data.role||'user',user:j.data.username||u,pass:p,photo:j.data.photo||''};
         DBS='online';lgBusy(false);lgStatus('');enterAppUI();syncDBm();return;
       }
       if(j&&j.ok===false){lgBusy(false);lgStatus(j.error||'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง','err');return;}
@@ -405,12 +391,13 @@ async function syncDBm(){
     const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'bootstrap'})});
     const j=await res.json();
     if(j&&j.ok&&j.data){
-      const d=j.data,D=v=>(''+(v==null?'':v)).slice(0,10);
-      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:String(e.emp_id==null?'':e.emp_id),name:String(e.full_name==null?'':e.full_name),dept:String(e.dept==null?'':e.dept),pos:String(e.position==null?'':e.position),role:String(e.role||'user'),user:String(e.username==null?'':e.username),pass:String(e.password_hash==null?'':e.password_hash),photo:String(e.photo||'')})).filter(e=>e.id);
-      if(Array.isArray(d.records)) records=d.records.map(r=>({id:String(r.record_id==null?'':r.record_id),emp:String(r.emp_id==null?'':r.emp_id),cat:String(r.category||''),start:D(r.start_date),end:D(r.end_date||r.start_date),title:String(r.title==null?'':r.title),location:String(r.location||''),st:String(r.start_time||''),et:String(r.end_time||''),status:String(r.status||'none'),overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:String(r.note||'')})).filter(r=>CAT[r.cat]);
-      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:String(h.name==null?'':h.name),type:String(h.type||'public')})).filter(h=>/^\d{4}-\d{2}-\d{2}$/.test(h.date));
-      const meNow=employees.find(e=>String(e.id)===String(CUR.id));
-      if(meNow){CUR.name=meNow.name||CUR.name;CUR.dept=meNow.dept||CUR.dept;CUR.pos=meNow.pos||CUR.pos;CUR.role=meNow.role||CUR.role;if(meNow.photo)CUR.photo=meNow.photo;setAva('ab-ava',CUR);document.getElementById('ab-name').textContent=(CUR.name||CUR.user||'').split(' ')[0];}
+      const d=j.data,D=v=>{if(v==null||v==='')return '';v=''+v;
+        if(v.indexOf('T')>0&&(v.slice(-1)==='Z'||/[+-]\d{2}:\d{2}$/.test(v))){const dt=new Date(v);return new Date(dt.getTime()+7*3600*1000).toISOString().slice(0,10);} // แปลง UTC → เวลาไทย กันวันเลื่อน
+        return v.slice(0,10);};
+      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:e.emp_id,name:e.full_name,dept:e.dept,pos:e.position,role:e.role||'user',user:e.username,pass:e.password_hash,photo:e.photo||''}));
+      if(Array.isArray(d.records)) records=d.records.map(r=>({id:r.record_id,emp:r.emp_id,cat:r.category,start:D(r.start_date),end:D(r.end_date||r.start_date),title:r.title,location:r.location||'',st:r.start_time||'',et:r.end_time||'',status:r.status||'none',overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:r.note||''})).filter(r=>CAT[r.cat]);
+      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:h.name,type:h.type||'public'}));
+      const meNow=employees.find(e=>e.id===CUR.id);if(meNow&&!CUR.photo)CUR.photo=meNow.photo||'';
       setDBm('online');nav(curScr);
     } else setDBm('offline');
   }catch(e){ setDBm('offline'); }
@@ -503,7 +490,7 @@ function renderProfile(){
   <div class="prof-list">
     <div class="prof-row"><div class="ic">${I.user}</div><div><div class="l">@${esc(CUR.user)}</div><div class="v">ชื่อผู้ใช้งาน</div></div></div>
     <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${esc(CUR.id)}</div><div class="v">รหัสสมาชิก</div></div></div>
-    <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${({user:'ผู้ใช้ทั่วไป',approver:'ผู้อนุมัติ',admin:'ผู้ดูแลระบบ'})[CUR.role]||'ผู้ใช้ทั่วไป'}</div><div class="v">สิทธิ์การใช้งาน</div></div></div>
+    <div class="prof-row"><div class="ic">${I.badge}</div><div><div class="l">${({user:'ผู้ใช้ทั่วไป',approver:'ผู้อนุมัติ',admin:'ผู้ดูแลระบบ'})[CUR.role]}</div><div class="v">สิทธิ์การใช้งาน</div></div></div>
     <div class="prof-row"><div class="ic">${I.line}</div><div><div class="l">เชื่อมต่อ LINE</div><div class="v">รับการแจ้งเตือน</div></div><div class="tg on" style="margin-left:auto" onclick="this.classList.toggle('on')"></div></div>
     <div class="prof-row" onclick="openHolidays()"><div class="ic" style="background:#FDECEC;color:#C0392B">${I.cal}</div><div><div class="l">วันหยุดบริษัท</div><div class="v">${holidays.length} วันในปีนี้</div></div><div class="ar">${I.ar}</div></div>
   </div>
@@ -517,7 +504,7 @@ function openProfileEdit(){
   openSheet('แก้ไขโปรไฟล์',`
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
       <div id="pf-ava" style="width:92px;height:92px;border-radius:28px;background:${avaColor(CUR.id)};display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;color:#fff;font-weight:600">${_profPhoto?`<img src="${_profPhoto}" style="width:100%;height:100%;object-fit:cover">`:initial(CUR.name)}</div>
-      <button class="chip" style="margin-top:12px" onclick="pickProfilePhoto()">เปลี่ยนรูปโปรไฟล์</button>
+      <button class="chip" style="margin-top:12px" onclick="pickPhoto(function(d){_profPhoto=d;document.getElementById('pf-ava').innerHTML='<img src=\''+d+'\' style=\'width:100%;height:100%;object-fit:cover\'>';})">เปลี่ยนรูปโปรไฟล์</button>
     </div>
     <div class="field"><label>ชื่อ-นามสกุล</label><input id="pf-name" value="${esc(CUR.name)}"></div>
     <div class="field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="pf-user" class="mono" value="${esc(CUR.user)}"></div>
@@ -532,18 +519,11 @@ async function saveProfile(){
   setAva('ab-ava',CUR);document.getElementById('ab-name').textContent=name.split(' ')[0];
   closeSheet();nav('profile');
   if(CONFIG.SHEETS_API_URL){
-    const AP=CONFIG.SHEETS_API_URL, HD={'Content-Type':'text/plain;charset=utf-8'};
-    try{const res=await fetch(AP,{method:'POST',headers:HD,body:JSON.stringify({action:'updateProfile',emp_id:CUR.id,full_name:name,username:user,password:pass||'',photo:_profPhoto})});
+    try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateProfile',emp_id:CUR.id,full_name:name,username:user,password:pass||'',photo:_profPhoto})});
       const j=await res.json();
-      if(j&&j.ok){
-        let confirmed=false,hasPhoto=false;
-        try{const c=await fetch(AP,{method:'POST',headers:HD,body:JSON.stringify({action:'photoStatus',emp_id:CUR.id})});const cj=await c.json();if(cj&&cj.ok&&cj.data){confirmed=true;hasPhoto=!!cj.data.hasPhoto;}}catch(e){}
-        if(confirmed){ if(!_profPhoto||hasPhoto) toast('✓ ยืนยันแล้ว: บันทึกลงฐานข้อมูล'+(_profPhoto?' พร้อมรูป':'')+' • เปิดเครื่องอื่นเห็นได้');
-          else toast('บันทึกแล้ว แต่ยังไม่พบรูปในฐานข้อมูล — โปรด Deploy Apps Script ใหม่','warn'); }
-        else toast('⚠ บันทึกแล้ว แต่ยืนยันรูปไม่ได้ — โค้ดที่ Deploy เป็นเวอร์ชันเก่า โปรด Deploy เวอร์ชันใหม่','warn');
-      }
+      if(j&&j.ok){toast('บันทึกโปรไฟล์เข้าฐานข้อมูลแล้ว');}
       else{toast(((j&&j.error)||'บันทึกลงฐานข้อมูลไม่สำเร็จ'),'warn');}
-    }catch(e){toast('ออฟไลน์ • บันทึกในเครื่องเท่านั้น (เครื่องอื่นยังไม่เห็น)','warn');}
+    }catch(e){toast('ออฟไลน์ • บันทึกในเครื่องแล้ว','warn');}
   } else { toast('บันทึกโปรไฟล์แล้ว'); }
 }
 
@@ -565,20 +545,10 @@ function openPicker(){
 function pick(type,c,icon,t,s){return `<button class="pick" style="width:100%;text-align:left" onclick="openForm('${type}')"><div class="ic" style="background:${c}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div><div class="ar">${I.ar}</div></button>`;}
 
 let formType='sick';
-function isManager(){return CUR.role==='admin'||CUR.role==='approver';}
-function empOptM(sel){return employees.filter(e=>!e.status||e.status==='active').map(e=>`<option value="${e.id}" ${String(e.id)===String(sel)?'selected':''}>${esc(e.name)} (${e.id})</option>`).join('');}
-function onBehalfField(){return isManager()?`<div class="field"><label>บันทึกในนามของ</label><select id="f-emp">${empOptM(CUR.id)}</select></div>`:'';}
-function formEmp(){const el=document.getElementById('f-emp');return el?el.value:CUR.id;}
-async function saveRecordDB(rec){
-  if(!CONFIG.SHEETS_API_URL)return;
-  try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'createRecord',emp_id:rec.emp,category:rec.cat,start_date:rec.start,end_date:rec.end,start_time:rec.st,end_time:rec.et,title:rec.title,location:rec.location,overnight:rec.overnight,cost:rec.cost,note:rec.note})});}catch(e){}
-}
-function behalfToast(rec,msg){const other=String(rec.emp)!==String(CUR.id);toast(other?('บันทึกในนามของ '+esc(emp(rec.emp).name)+' แล้ว'):msg);}
 function openForm(group){
   const today=TODAY;
   if(group==='leave'){formType='sick';
     openSheet('แจ้งลา',`
-      ${onBehalfField()}
       <div class="field"><label>ประเภทการลา</label><div class="type-grid" id="type-grid">
         ${['sick','personal','other','vacation'].map(k=>typeOpt(k)).join('')}</div></div>
       <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
@@ -586,7 +556,6 @@ function openForm(group){
       ${submitBtn('submitLeave()')}`);
   } else if(group==='training'){formType='internal';
     openSheet('อบรม / กิจกรรม',`
-      ${onBehalfField()}
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['internal','esv','event'].map(k=>typeOpt(k)).join('')}</div></div>
       <div class="field"><label>ชื่อหัวข้อ / กิจกรรม</label><input id="f-title" placeholder="เช่น อบรม Security ภายใน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น ห้องประชุม A / ศูนย์ ESV"></div>
@@ -596,7 +565,6 @@ function openForm(group){
   } else { // overtime or offsite
     formType=group;
     openSheet(group==='overtime'?'ทำงานล่วงเวลา (OT)':'งานนอกสถานที่',`
-      ${onBehalfField()}
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['overtime','offsite'].map(k=>typeOpt(k,'otToggle')).join('')}</div></div>
       <div class="field"><label>ชื่องาน</label><input id="f-title" placeholder="เช่น ปิดยอดสิ้นเดือน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น สำนักงาน / ชลบุรี"></div>
@@ -617,16 +585,16 @@ function submitBtn(fn){return `<button class="submit" onclick="${fn}">${I.check}
 const fv=id=>{const e=document.getElementById(id);return e?e.value:'';};
 
 function submitLeave(){const cat=formType;
-  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'});
-  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
+  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'}));
+  closeSheet();nav(curScr);toast(CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
 function submitTrain(){const cat=formType;
-  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),status:CAT[cat].approve?'pending':'none'});
-  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,'บันทึกรายการแล้ว');}
+  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),status:CAT[cat].approve?'pending':'none'}));
+  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว');}
 function submitOT(){const cat=formType;const off=cat==='offsite';
   const overnight=off&&document.getElementById('f-overnight').classList.contains('on');
   const hasCost=off&&document.getElementById('f-hascost').classList.contains('on');
-  const rec=R(formEmp(),cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),overnight,cost:hasCost?Number(fv('f-cost')||0):null,status:'pending'});
-  records.unshift(rec);saveRecordDB(rec);closeSheet();nav(curScr);behalfToast(rec,'บันทึกรายการแล้ว รออนุมัติ');}
+  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),overnight,cost:hasCost?Number(fv('f-cost')||0):null,status:'pending'}));
+  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว รออนุมัติ');}
 
 function openHolidays(){
   const sorted=[...holidays].sort((a,b)=>a.date<b.date?-1:1); const byM={};
