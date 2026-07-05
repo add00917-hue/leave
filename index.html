@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GNR3 Team Plans — แอปสมาชิก</title>
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/add00917-hue/parkzone-assets/main/OPS-GNR3.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/add00917-hue/parkzone-assets/main/OPS-GNR3.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -37,7 +39,8 @@ input,select,textarea{font-family:inherit}
 .login .glow.y{width:240px;height:240px;background:rgba(255,197,46,.35);top:-60px;right:-50px}
 .login .glow.b{width:300px;height:300px;background:rgba(61,107,176,.5);bottom:-90px;left:-70px}
 .login-inner{position:relative;z-index:2;text-align:center}
-.lg-mark{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,var(--yellow-bright),var(--yellow-dark));display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:22px;color:var(--navy-deep);box-shadow:0 12px 30px rgba(255,180,20,.4);margin:0 auto 24px}
+.lg-mark{width:min(210px,52vw);height:auto;aspect-ratio:1;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.lg-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 34px rgba(0,0,0,.45))}
 .lg-word{font-family:var(--mono);font-weight:600;font-size:40px;letter-spacing:1px;line-height:1}.lg-word .ac{color:var(--yellow-bright)}
 .lg-sub{font-size:14px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.5}
 .lg-form{margin-top:34px;display:flex;flex-direction:column;gap:14px;text-align:left}
@@ -194,8 +197,7 @@ input,select,textarea{font-family:inherit}
   <div class="login" id="login">
     <div class="glow y"></div><div class="glow b"></div>
     <div class="login-inner">
-      <div class="lg-mark">G3</div>
-      <div class="lg-word">GN<span class="ac">R3</span></div>
+      <div class="lg-mark"><img src="https://raw.githubusercontent.com/add00917-hue/parkzone-assets/main/OPS-GNR3.png" alt="OPS-BSCS GNR3"></div>
       <div class="lg-sub">Plans &amp; activities of the GNR3 team<br>แอปสมาชิก — บันทึกแผนงานและกิจกรรม</div>
       <div class="lg-form">
         <div class="lg-field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="lg-user" placeholder="กรอกชื่อผู้ใช้งาน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
@@ -283,15 +285,7 @@ const I={
   inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
 };
 
-const employees=[
-  {id:'EMP003',name:'ธนภัทร วงศ์ทอง',dept:'พัฒนา',pos:'Frontend Dev',role:'user',user:'thanapat',pass:'gnr3@123'},
-  {id:'EMP001',name:'สมชาย ใจดี',dept:'ปฏิบัติการ',pos:'Ops Lead',role:'approver',user:'somchai',pass:'gnr3@123'},
-  {id:'EMP004',name:'วิภาวี ศรีสุข',dept:'พัฒนา',pos:'Eng Manager',role:'approver',user:'wipawee',pass:'gnr3@123'},
-  {id:'EMP005',name:'ปรเมศวร์ ก.',dept:'ภาคสนาม',pos:'Field Engineer',role:'user',user:'poramet',pass:'gnr3@123'},
-  {id:'EMP006',name:'ชนิกานต์ ม.',dept:'บุคคล',pos:'HR Officer',role:'user',user:'chanikan',pass:'gnr3@123'},
-  {id:'EMP008',name:'พิมพ์ชนก ด.',dept:'การตลาด',pos:'Content',role:'user',user:'pimchanok',pass:'gnr3@123'},
-  {id:'ADM001',name:'กนกพร สุวรรณ',dept:'บุคคล',pos:'HR Admin',role:'admin',user:'admin',pass:'gnr3@admin'}
-];
+let employees=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
 const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
 function avaColor(id){id=id||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
@@ -299,24 +293,13 @@ let _profPhoto='';
 function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
 const initial=n=>(n||'?').trim().charAt(0);
-function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
 function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
   emp:empId,cat,start,end:end||start,title:o.title||CAT[cat].th,location:o.location||'',st:o.st||'',et:o.et||'',
   status:CAT[cat].approve?(o.status||'pending'):'none',overnight:o.overnight||false,cost:o.cost!=null?o.cost:null,note:o.note||''},o);}
-let records=[
-  R('EMP003','sick','2026-06-30','2026-06-30',{status:'pending',note:'มีไข้ พบแพทย์'}),
-  R('EMP003','internal','2026-07-03','2026-07-04',{title:'React ขั้นสูง',location:'ออนไลน์',status:'approved'}),
-  R('EMP003','event','2026-06-12','2026-06-12',{title:'Workshop ออกแบบ',location:'ภายในองค์กร'}),
-  R('EMP003','vacation','2026-07-21','2026-07-22',{note:'พักร้อน'}),
-  R('EMP005','offsite','2026-06-30','2026-07-01',{title:'ติดตั้งระบบลูกค้า',location:'ชลบุรี',overnight:true,cost:2500,status:'approved'}),
-  R('EMP001','event','2026-07-05','2026-07-05',{title:'กิจกรรม CSR ปลูกป่า',location:'ระยอง'}),
-  R('EMP004','vacation','2026-06-22','2026-06-23',{}),
-  R('EMP006','esv','2026-07-08','2026-07-09',{title:'อบรมมาตรฐาน ESV',location:'ศูนย์ ESV',status:'pending'}),
-  R('EMP008','vacation','2026-07-07','2026-07-11',{}),
-  R('EMP005','overtime','2026-07-03','2026-07-03',{title:'เตรียมอุปกรณ์',location:'คลังสินค้า',st:'17:30',et:'20:00',status:'pending'})
-];
+let records=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
 let CUR=employees[0];
 let holidays=[
   {date:'2026-01-01',name:'วันขึ้นปีใหม่',type:'public'},{date:'2026-01-02',name:'หยุดชดเชยกรณีพิเศษ',type:'company'},
@@ -382,7 +365,7 @@ const recOn=ds=>records.filter(r=>r.start<=ds&&ds<=r.end);
 
 /* ---- database connection ---- */
 let DBS='connecting';
-function dbBar(){const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • ใช้ข้อมูลตัวอย่าง']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
+function dbBar(){const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • เชื่อมต่อฐานข้อมูลไม่ได้']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
 function setDBm(st){DBS=st;if(curScr==='home')renderHome();}
 async function syncDBm(){
   if(!CONFIG.SHEETS_API_URL){setDBm('offline');return;}
@@ -394,9 +377,10 @@ async function syncDBm(){
       const d=j.data,D=v=>{if(v==null||v==='')return '';v=''+v;
         if(v.indexOf('T')>0&&(v.slice(-1)==='Z'||/[+-]\d{2}:\d{2}$/.test(v))){const dt=new Date(v);return new Date(dt.getTime()+7*3600*1000).toISOString().slice(0,10);} // แปลง UTC → เวลาไทย กันวันเลื่อน
         return v.slice(0,10);};
-      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:e.emp_id,name:e.full_name,dept:e.dept,pos:e.position,role:e.role||'user',user:e.username,pass:e.password_hash,photo:e.photo||''}));
-      if(Array.isArray(d.records)) records=d.records.map(r=>({id:r.record_id,emp:r.emp_id,cat:r.category,start:D(r.start_date),end:D(r.end_date||r.start_date),title:r.title,location:r.location||'',st:r.start_time||'',et:r.end_time||'',status:r.status||'none',overnight:r.overnight===true||r.overnight==='TRUE'||r.overnight==='true',cost:(r.cost===''||r.cost==null)?null:Number(r.cost),note:r.note||''})).filter(r=>CAT[r.cat]);
-      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:h.name,type:h.type||'public'}));
+      const S=v=>v==null?'':String(v).trim(); // Sheets ส่งชนิดข้อมูลปนกัน ต้องบังคับเป็น string
+      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:S(e.emp_id),name:S(e.full_name),dept:S(e.dept),pos:S(e.position),role:S(e.role).toLowerCase()||'user',user:S(e.username),pass:S(e.password_hash),photo:S(e.photo)}));
+      if(Array.isArray(d.records)) records=d.records.map(r=>({id:S(r.record_id),emp:S(r.emp_id),cat:S(r.category).toLowerCase(),start:D(r.start_date),end:D(r.end_date||r.start_date),title:S(r.title),location:S(r.location),st:S(r.start_time),et:S(r.end_time),status:S(r.status).toLowerCase()||'none',overnight:r.overnight===true||S(r.overnight).toUpperCase()==='TRUE',cost:(r.cost===''||r.cost==null||isNaN(Number(r.cost)))?null:Number(r.cost),note:S(r.note)})).filter(r=>CAT[r.cat]&&r.start);
+      if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:S(h.name),type:S(h.type)||'public'}));
       const meNow=employees.find(e=>e.id===CUR.id);if(meNow&&!CUR.photo)CUR.photo=meNow.photo||'';
       setDBm('online');nav(curScr);
     } else setDBm('offline');
