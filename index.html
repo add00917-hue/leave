@@ -43,6 +43,12 @@ input,select,textarea{font-family:inherit}
 .lg-mark img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 34px rgba(0,0,0,.45))}
 .lg-word{font-family:var(--mono);font-weight:600;font-size:40px;letter-spacing:1px;line-height:1}.lg-word .ac{color:var(--yellow-bright)}
 .lg-sub{font-size:14px;color:rgba(255,255,255,.7);margin-top:8px;line-height:1.5}
+.lg-conn{display:inline-flex;align-items:center;gap:8px;margin:16px auto 0;padding:7px 16px;border-radius:999px;font-size:12.5px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.85);align-self:center}
+.lg-conn .dot{width:7px;height:7px;border-radius:50%;background:#f5b301;box-shadow:0 0 0 3px rgba(245,179,1,.22);animation:lgpulse 1.6s infinite}
+.lg-conn.on .dot{background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.25)}
+.lg-conn.off .dot{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.22);animation:none}
+@keyframes lgpulse{0%,100%{opacity:1}50%{opacity:.45}}
 .lg-form{margin-top:34px;display:flex;flex-direction:column;gap:14px;text-align:left}
 .lg-field label{font-size:12px;color:rgba(255,255,255,.65);font-weight:500;display:block;margin-bottom:7px}
 .lg-field input{width:100%;padding:15px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-size:15px;outline:none;transition:.16s}
@@ -205,7 +211,7 @@ input,select,textarea{font-family:inherit}
         <button class="lg-btn" onclick="doLogin()">เข้าสู่ระบบ
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
         <div class="lg-status" id="lg-status"></div>
-        <div class="lg-hint">ตัวอย่างเข้าใช้: <b>thanapat</b> / gnr3@123 (สมาชิก)<br>หรือ <b>admin</b> / gnr3@admin (ผู้ดูแล)</div>
+        <div class="lg-conn" id="lg-conn"><span class="dot"></span><span id="lg-conn-txt">กำลังตรวจสอบการเชื่อมต่อ...</span></div>
       </div>
     </div>
     <div class="lg-foot">OPS-BSCS • © 2026</div>
@@ -288,11 +294,12 @@ const I={
 let employees=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
 const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
-function avaColor(id){id=id||'x';let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
+function avaColor(id){id=String(id==null||id===''?'x':id);let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
+function pickProfilePhoto(){pickPhoto(function(d){_profPhoto=d;const el=document.getElementById('pf-ava');if(el)el.innerHTML='<img src="'+d+'" style="width:100%;height:100%;object-fit:cover">';});}
 function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
-const initial=n=>(n||'?').trim().charAt(0);
+const initial=n=>String(n==null||n===''?'?':n).trim().charAt(0)||'?';
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
@@ -335,7 +342,8 @@ async function doLogin(){
       const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login',username:u,password:p})});
       const j=await res.json();
       if(j&&j.ok&&j.data&&j.data.emp_id){
-        CUR={id:j.data.emp_id,name:j.data.full_name,dept:j.data.dept,pos:j.data.position,role:j.data.role||'user',user:j.data.username||u,pass:p,photo:j.data.photo||''};
+        const S=v=>v==null?'':String(v).trim();
+        CUR={id:S(j.data.emp_id),name:S(j.data.full_name),dept:S(j.data.dept),pos:S(j.data.position),role:S(j.data.role).toLowerCase()||'user',user:S(j.data.username)||u,pass:p,photo:S(j.data.photo)};
         DBS='online';lgBusy(false);lgStatus('');enterAppUI();syncDBm();return;
       }
       if(j&&j.ok===false){lgBusy(false);lgStatus(j.error||'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง','err');return;}
@@ -346,7 +354,7 @@ async function doLogin(){
   CUR=Object.assign({photo:''},found);DBS='offline';lgBusy(false);lgStatus('');enterAppUI();
   toast('ออฟไลน์ • เข้าสู่ระบบด้วยข้อมูลตัวอย่าง','warn');syncDBm();
 }
-function logout(){closeSheet();document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');}
+function logout(){closeSheet();document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');pingConn();}
 
 /* ===== NAV ===== */
 const SCR={home:['หน้าแรก','ภาพรวมของฉันวันนี้'],cal:['ปฏิทินทีม','กิจกรรมของทั้งทีม'],list:['รายการของฉัน','สถานะคำขอและบันทึก'],profile:['โปรไฟล์','ข้อมูลบัญชีของฉัน']};
@@ -357,7 +365,12 @@ function nav(s){curScr=s;
   document.getElementById('s-'+s).classList.add('on');
   document.getElementById('scr-title').textContent=SCR[s][0];
   document.getElementById('scr-sub').textContent=SCR[s][1];
-  if(s==='home')renderHome();if(s==='cal')renderCal();if(s==='list')renderList();if(s==='profile')renderProfile();
+  try{
+    if(s==='home')renderHome();if(s==='cal')renderCal();if(s==='list')renderList();if(s==='profile')renderProfile();
+  }catch(err){ // ห้ามปล่อยจอขาว — แสดงข้อผิดพลาดและปุ่มลองใหม่
+    const el=document.getElementById('s-'+s);
+    if(el)el.innerHTML=`<div class="card" style="padding:22px;text-align:center"><div style="font-weight:700;margin-bottom:6px">แสดงข้อมูลไม่สำเร็จ</div><div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">${esc(err.message||'เกิดข้อผิดพลาด')}</div><button class="lg-btn" style="width:auto;padding:12px 22px" onclick="syncDBm()">โหลดข้อมูลใหม่</button></div>`;
+  }
   document.querySelector('.screens').scrollTop=0;
 }
 const myRecs=()=>records.filter(r=>r.emp===CUR.id);
@@ -365,6 +378,21 @@ const recOn=ds=>records.filter(r=>r.start<=ds&&ds<=r.end);
 
 /* ---- database connection ---- */
 let DBS='connecting';
+/* ตรวจสถานะการเชื่อมต่อจริงบนหน้า login */
+async function pingConn(){
+  const box=document.getElementById('lg-conn'),txt=document.getElementById('lg-conn-txt');
+  if(!box||!txt)return;
+  const setC=(cls,msg)=>{box.classList.remove('on','off');if(cls)box.classList.add(cls);txt.textContent=msg;};
+  if(!CONFIG.SHEETS_API_URL){setC('off','ยังไม่ได้ตั้งค่าฐานข้อมูล');return;}
+  setC('','กำลังตรวจสอบการเชื่อมต่อ...');
+  try{
+    const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'})});
+    const j=await res.json();
+    if(j&&j.ok){setC('on','ระบบพร้อมใช้งาน • OPS-BSCS');}
+    else setC('off','เชื่อมต่อฐานข้อมูลไม่ได้');
+  }catch(e){setC('off','เชื่อมต่อฐานข้อมูลไม่ได้ • ออฟไลน์');}
+}
+document.addEventListener('DOMContentLoaded',pingConn);
 function dbBar(){const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • เชื่อมต่อฐานข้อมูลไม่ได้']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
 function setDBm(st){DBS=st;if(curScr==='home')renderHome();}
 async function syncDBm(){
@@ -381,7 +409,11 @@ async function syncDBm(){
       if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:S(e.emp_id),name:S(e.full_name),dept:S(e.dept),pos:S(e.position),role:S(e.role).toLowerCase()||'user',user:S(e.username),pass:S(e.password_hash),photo:S(e.photo)}));
       if(Array.isArray(d.records)) records=d.records.map(r=>({id:S(r.record_id),emp:S(r.emp_id),cat:S(r.category).toLowerCase(),start:D(r.start_date),end:D(r.end_date||r.start_date),title:S(r.title),location:S(r.location),st:S(r.start_time),et:S(r.end_time),status:S(r.status).toLowerCase()||'none',overnight:r.overnight===true||S(r.overnight).toUpperCase()==='TRUE',cost:(r.cost===''||r.cost==null||isNaN(Number(r.cost)))?null:Number(r.cost),note:S(r.note)})).filter(r=>CAT[r.cat]&&r.start);
       if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:S(h.name),type:S(h.type)||'public'}));
-      const meNow=employees.find(e=>e.id===CUR.id);if(meNow&&!CUR.photo)CUR.photo=meNow.photo||'';
+      const meNow=employees.find(e=>e.id===CUR.id);
+      if(meNow){ // ข้อมูลจากชีตคือความจริง — ชื่อ/รูป/บทบาทบนหัวแอปต้องตรงเสมอ
+        CUR.name=meNow.name||CUR.name;CUR.dept=meNow.dept;CUR.pos=meNow.pos;CUR.role=meNow.role||CUR.role;CUR.photo=meNow.photo||CUR.photo||'';
+        setAva('ab-ava',CUR);const nEl=document.getElementById('ab-name');if(nEl)nEl.textContent=CUR.name?CUR.name.split(' ')[0]:CUR.user;
+      }
       setDBm('online');nav(curScr);
     } else setDBm('offline');
   }catch(e){ setDBm('offline'); }
@@ -410,7 +442,8 @@ function renderHome(){
   <div class="card">${upcoming.length?upcoming.map(recRow).join(''):emptyHTML('ไม่มีรายการที่กำลังจะถึง')}</div>`;
 }
 function qa(type,color,icon,t,s){return `<button class="qa" onclick="openForm('${type}')"><div class="ic" style="background:${color}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div></button>`;}
-function recRow(r){return `<div class="rec-item"><div class="bar" style="background:${CAT[r.cat].c}"></div>
+function CATX(r){return CAT[r.cat]||{c:'#8896AB',th:r.cat||'อื่นๆ',g:'other'};}
+function recRow(r){return `<div class="rec-item"><div class="bar" style="background:${CATX(r).c}"></div>
   <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}${r.location?' • '+esc(r.location):''}</div></div>
   <span class="st st-${r.status}">${ST[r.status]}</span></div>`;}
 function emptyHTML(t){return `<div class="empty">${I.inbox}<h4>${t}</h4><p>กดปุ่ม + เพื่อเพิ่มรายการ</p></div>`;}
@@ -422,7 +455,7 @@ function renderCal(){
   for(let i=0;i<first;i++)cells+=`<div class="cal-c muted"></div>`;
   for(let d=1;d<=dim;d++){const ds=calY+'-'+pad(calM+1)+'-'+pad(d);const recs=recOn(ds);const dow=new Date(calY,calM,d).getDay();const hol=holiName(ds);
     const cls=['cal-c'];if(ds===TODAY)cls.push('today');if(ds===selDate)cls.push('sel');if(dow===0||dow===6)cls.push('we');if(hol)cls.push('holi');
-    let dots=(hol?'<span class="dot" style="background:#C0392B"></span>':'')+recs.slice(0,3).map(r=>`<span class="dot" style="background:${CAT[r.cat].c}"></span>`).join('');
+    let dots=(hol?'<span class="dot" style="background:#C0392B"></span>':'')+recs.slice(0,3).map(r=>`<span class="dot" style="background:${CATX(r).c}"></span>`).join('');
     cells+=`<div class="${cls.join(' ')}" onclick="selDate='${ds}';renderCal();openDay('${ds}')">${d}<div class="dots">${dots}</div></div>`;}
   const recs=recOn(selDate);
   document.getElementById('s-cal').innerHTML=`
@@ -438,25 +471,25 @@ function renderCal(){
 function calStep(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
 function openDay(ds){const recs=recOn(ds);const d=parse(ds);const hol=holiName(ds);
   openSheet(`${d.getDate()} ${THAI_M[d.getMonth()]} ${be(d.getFullYear())}`,
-    `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(r=>{const e=emp(r.emp);return `<div class="rec-item" style="border:1px solid var(--line);border-radius:14px"><div class="bar" style="background:${CAT[r.cat].c}"></div>
+    `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(r=>{const e=emp(r.emp);return `<div class="rec-item" style="border:1px solid var(--line);border-radius:14px"><div class="bar" style="background:${CATX(r).c}"></div>
       <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${esc(e.name)} • ${r.st?r.st+(r.et?'-'+r.et:'')+' • ':''}${r.location?esc(r.location):'—'}</div></div>
-      <span class="cat-pill" style="background:${CAT[r.cat].c}">${CAT[r.cat].th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`);
+      <span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`);
 }
 
 /* ===== MY LIST ===== */
 function renderList(){
   const mine=myRecs();
   const groups={all:'ทั้งหมด',leave:'ลา',training:'อบรม/กิจกรรม',ot:'OT/นอกสถานที่'};
-  const f=listF==='all'?mine:mine.filter(r=>CAT[r.cat].g===listF);
+  const f=listF==='all'?mine:mine.filter(r=>CATX(r).g===listF);
   document.getElementById('s-list').innerHTML=`
   <div class="chips">${Object.keys(groups).map(k=>`<button class="chip ${listF===k?'on':''}" onclick="listF='${k}';renderList()">${groups[k]}</button>`).join('')}</div>
-  <div class="card">${f.length?f.sort((a,b)=>a.start<b.start?1:-1).map(r=>`<div class="rec-item" onclick="openRec('${r.id}')"><div class="bar" style="background:${CAT[r.cat].c}"></div>
-    <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m"><span class="cat-pill" style="background:${CAT[r.cat].c}">${CAT[r.cat].th}</span> ${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}</div></div>
+  <div class="card">${f.length?f.sort((a,b)=>a.start<b.start?1:-1).map(r=>`<div class="rec-item" onclick="openRec('${r.id}')"><div class="bar" style="background:${CATX(r).c}"></div>
+    <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m"><span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span> ${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}</div></div>
     <span class="st st-${r.status}">${ST[r.status]}</span></div>`).join(''):emptyHTML('ยังไม่มีรายการ')}</div>`;
 }
 function openRec(id){const r=records.find(x=>x.id===id);
   openSheet('รายละเอียด',`<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-    <span class="cat-pill" style="background:${CAT[r.cat].c};font-size:12px;padding:4px 12px">${CAT[r.cat].th}</span><span class="st st-${r.status}">${ST[r.status]}</span></div>
+    <span class="cat-pill" style="background:${CATX(r).c};font-size:12px;padding:4px 12px">${CATX(r).th}</span><span class="st st-${r.status}">${ST[r.status]||esc(r.status)||'—'}</span></div>
     <div style="font-size:18px;font-weight:700;margin-bottom:14px">${esc(r.title)}</div>
     <div class="prof-row"><div class="ic">${I.cal}</div><div><div class="l" style="font-size:13px">${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}</div><div class="v">วันที่</div></div></div>
     ${r.location?`<div class="prof-row"><div class="ic">${I.pin}</div><div><div class="l" style="font-size:13px">${esc(r.location)}</div><div class="v">สถานที่</div></div></div>`:''}
@@ -488,7 +521,7 @@ function openProfileEdit(){
   openSheet('แก้ไขโปรไฟล์',`
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
       <div id="pf-ava" style="width:92px;height:92px;border-radius:28px;background:${avaColor(CUR.id)};display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;color:#fff;font-weight:600">${_profPhoto?`<img src="${_profPhoto}" style="width:100%;height:100%;object-fit:cover">`:initial(CUR.name)}</div>
-      <button class="chip" style="margin-top:12px" onclick="pickPhoto(function(d){_profPhoto=d;document.getElementById('pf-ava').innerHTML='<img src=\''+d+'\' style=\'width:100%;height:100%;object-fit:cover\'>';})">เปลี่ยนรูปโปรไฟล์</button>
+      <button class="chip" style="margin-top:12px" onclick="pickProfilePhoto()">เปลี่ยนรูปโปรไฟล์</button>
     </div>
     <div class="field"><label>ชื่อ-นามสกุล</label><input id="pf-name" value="${esc(CUR.name)}"></div>
     <div class="field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="pf-user" class="mono" value="${esc(CUR.user)}"></div>
