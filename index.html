@@ -261,8 +261,24 @@ const CAT={
   esv:{g:'training',th:'อบรม ESV',c:'#0891B2',approve:true},
   event:{g:'training',th:'กิจกรรม',c:'#EC4899',approve:false},
   overtime:{g:'ot',th:'ทำล่วงเวลา OT',c:'#F97316',approve:true},
-  offsite:{g:'ot',th:'นอกสถานที่',c:'#14B8A6',approve:true}
+  offsite:{g:'ot',th:'นอกสถานที่',c:'#14B8A6',approve:true},
+  task:{g:'task',th:'มอบหมายงาน',c:'#7C3AED',approve:false}
 };
+const BUILDINGS=['ARI HILLS','BTSVP','อื่นๆ'];
+const TASKS=[
+  {th:'มอบหมายประจำอาคาร',en:'Building Assignment'},
+  {th:'การส่งของโดยผู้ขาย',en:'Vendor Delivery'},
+  {th:'สนับสนุนงานกิจกรรม/ฝึกอบรม',en:'Event & Training Support'},
+  {th:'บริการขนย้ายโดยผู้ขาย',en:'Vendor Moving Service'},
+  {th:'ติดตั้งโต๊ะทำงาน',en:'Workstation Installation'},
+  {th:'ติดตั้งระบบไฟฟ้าและเครือข่าย',en:'Electrical & Network Installation'},
+  {th:'ติดประกาศและสื่อสารประชาสัมพันธ์',en:'Signage & Communication'},
+  {th:'งานปรับปรุงพื้นที่',en:'Renovation Work'},
+  {th:'ตรวจรับและส่งมอบพื้นที่',en:'Site Inspection & Handover'},
+  {th:'การประชุม',en:'Meeting'},
+  {th:'งานบริการทำความสะอาด',en:'Cleaning Service'},
+  {th:'อื่นๆ',en:'Other'}
+];
 const ST={pending:'รออนุมัติ',approved:'อนุมัติแล้ว',rejected:'ไม่อนุมัติ',cancelled:'ยกเลิก',none:'บันทึกแล้ว'};
 const THAI_M=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const THAI_MS=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
@@ -303,7 +319,7 @@ const initial=n=>String(n==null||n===''?'?':n).trim().charAt(0)||'?';
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
-function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
+function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':cat==='task'?'TA-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
   emp:empId,cat,start,end:end||start,title:o.title||CAT[cat].th,location:o.location||'',st:o.st||'',et:o.et||'',
   status:CAT[cat].approve?(o.status||'pending'):'none',overnight:o.overnight||false,cost:o.cost!=null?o.cost:null,note:o.note||''},o);}
 let records=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
@@ -479,7 +495,7 @@ function openDay(ds){const recs=recOn(ds);const d=parse(ds);const hol=holiName(d
 /* ===== MY LIST ===== */
 function renderList(){
   const mine=myRecs();
-  const groups={all:'ทั้งหมด',leave:'ลา',training:'อบรม/กิจกรรม',ot:'OT/นอกสถานที่'};
+  const groups={all:'ทั้งหมด',leave:'ลา',training:'อบรม/กิจกรรม',ot:'OT/นอกสถานที่',task:'งานมอบหมาย'};
   const f=listF==='all'?mine:mine.filter(r=>CATX(r).g===listF);
   document.getElementById('s-list').innerHTML=`
   <div class="chips">${Object.keys(groups).map(k=>`<button class="chip ${listF===k?'on':''}" onclick="listF='${k}';renderList()">${groups[k]}</button>`).join('')}</div>
@@ -557,7 +573,8 @@ function openPicker(){
     ${pick('leave','#15396E',I.cal,'แจ้งลา','ป่วย / กิจ / อื่นๆ / พักร้อน')}
     ${pick('training','#0EA5E9',I.cap,'อบรม / กิจกรรม','อบรมภายใน / ESV / กิจกรรม')}
     ${pick('overtime','#F97316',I.bolt,'ทำงานล่วงเวลา (OT)','บันทึก OT')}
-    ${pick('offsite','#14B8A6',I.pin,'งานนอกสถานที่','ค้างคืน / ค่าใช้จ่าย')}`);
+    ${pick('offsite','#14B8A6',I.pin,'งานนอกสถานที่','ค้างคืน / ค่าใช้จ่าย')}
+    ${pick('task','#7C3AED',I.check,'มอบหมายงาน','Task Assignment • ไม่ต้องอนุมัติ')}`);
 }
 function pick(type,c,icon,t,s){return `<button class="pick" style="width:100%;text-align:left" onclick="openForm('${type}')"><div class="ic" style="background:${c}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div><div class="ar">${I.ar}</div></button>`;}
 
@@ -579,6 +596,15 @@ function openForm(group){
       <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
       <div class="row2"><div class="field"><label>เวลาเริ่ม</label><input type="time" id="f-st"></div><div class="field"><label>เวลาสิ้นสุด</label><input type="time" id="f-et"></div></div>
       ${submitBtn('submitTrain()')}`);
+  } else if(group==='task'){formType='task';
+    openSheet('มอบหมายงาน (Task Assignment)',`
+      <div class="field"><label>อาคาร</label><select id="t-build" onchange="taskBuildToggleM()">${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select></div>
+      <div class="field hidden" id="t-build-custom"><label>ระบุอาคาร (อื่นๆ)</label><input id="t-build-other" placeholder="ชื่ออาคาร/สถานที่"></div>
+      <div class="field"><label>ประเภทงาน</label><select id="t-type" onchange="taskTypeToggleM()">${TASKS.map((t,i)=>`<option value="${i}">${t.th} / ${t.en}</option>`).join('')}</select></div>
+      <div class="field hidden" id="t-type-custom"><label>ระบุประเภทงาน (อื่นๆ)</label><input id="t-type-other" placeholder="ระบุงานที่มอบหมาย"></div>
+      <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
+      <div class="field"><label>รายละเอียดเพิ่มเติม</label><textarea id="f-note" placeholder="รายละเอียดงาน / ผู้ประสานงาน / หมายเหตุ"></textarea></div>
+      ${submitBtn('submitTask()')}`);
   } else { // overtime or offsite
     formType=group;
     openSheet(group==='overtime'?'ทำงานล่วงเวลา (OT)':'งานนอกสถานที่',`
@@ -601,6 +627,18 @@ function otToggle(){const ex=document.getElementById('offsite-extra');if(ex)ex.c
 function submitBtn(fn){return `<button class="submit" onclick="${fn}">${I.check} ส่งรายการ</button>`;}
 const fv=id=>{const e=document.getElementById(id);return e?e.value:'';};
 
+function taskBuildToggleM(){const c=document.getElementById('t-build-custom');if(c)c.classList.toggle('hidden',fv('t-build')!=='อื่นๆ');}
+function taskTypeToggleM(){const c=document.getElementById('t-type-custom');if(c)c.classList.toggle('hidden',TASKS[+fv('t-type')].th!=='อื่นๆ');}
+async function submitTask(){
+  let build=fv('t-build'); if(build==='อื่นๆ')build=(fv('t-build-other')||'').trim()||'อื่นๆ';
+  const ti=+fv('t-type'); const title=TASKS[ti].th==='อื่นๆ'?((fv('t-type-other')||'').trim()||'อื่นๆ'):(TASKS[ti].th+' / '+TASKS[ti].en);
+  const start=fv('f-start'),end=fv('f-end'),note=fv('f-note');
+  if(!start){toast('กรุณาเลือกวันที่','err');return;}
+  records.unshift(R(CUR.id,'task',start,end,{title,location:build,note,status:'none'}));
+  closeSheet();nav(curScr);toast('มอบหมายงานแล้ว');
+  if(CONFIG.SHEETS_API_URL){try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({action:'createRecord',emp_id:CUR.id,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id})});}catch(e){}}
+}
 function submitLeave(){const cat=formType;
   records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'}));
   closeSheet();nav(curScr);toast(CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
