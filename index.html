@@ -194,6 +194,58 @@ input,select,textarea{font-family:inherit}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--navy-deep);color:#fff;padding:13px 22px;border-radius:14px;font-size:13.5px;font-weight:500;z-index:80;box-shadow:0 12px 30px rgba(0,0,0,.3);display:flex;align-items:center;gap:9px;opacity:0;transition:.3s;max-width:90%}
 .toast svg{width:18px;height:18px;color:var(--success)}.toast.show{opacity:1}
 .day-sheet-list{display:flex;flex-direction:column;gap:9px}
+/* ===== Bilingual Date/Time Picker (mobile) ===== */
+.dtf-btn{width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:#fff;display:flex;align-items:center;gap:12px;text-align:left;font-family:inherit}
+.dtf-btn:active{background:var(--canvas)}
+.dtf-btn .dtf-ic{color:var(--navy-mid);flex-shrink:0;display:flex}
+.dtf-btn .dtf-v{flex:1;min-width:0}
+.dtf-btn .dtf-th{font-size:15px;font-weight:600;color:var(--ink);line-height:1.2}
+.dtf-btn .dtf-en{font-size:11px;color:var(--ink-soft);font-weight:500;margin-top:2px}
+.dtf-btn.empty .dtf-th{color:var(--ink-soft);font-weight:500}
+.pk{position:absolute;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(7,24,46,.55);backdrop-filter:blur(4px)}
+.pk.open{display:flex}
+.pk-card{background:#fff;border-radius:24px;width:100%;max-width:380px;box-shadow:0 30px 70px rgba(7,24,46,.5);overflow:hidden;animation:pkpop .3s cubic-bezier(.16,1,.3,1)}
+@keyframes pkpop{from{opacity:0;transform:scale(.94) translateY(14px)}to{opacity:1;transform:none}}
+.pk-head{background:linear-gradient(135deg,var(--navy-dark),var(--navy));color:#fff;padding:20px 22px;position:relative}
+.pk-cap{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;opacity:.6;font-family:var(--mono)}
+.pk-th{font-size:23px;font-weight:700;margin-top:5px;line-height:1.15}
+.pk-en{font-size:12.5px;opacity:.72;margin-top:2px}
+.pk-x{position:absolute;top:15px;right:15px;width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff}
+.pk-x svg{width:18px;height:18px}
+.pk-body{padding:16px 18px 18px}
+.pk-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pk-nav button{width:42px;height:42px;border-radius:13px;background:var(--canvas);color:var(--navy);display:flex;align-items:center;justify-content:center}
+.pk-nav button svg{width:20px;height:20px}
+.pk-my{text-align:center;line-height:1.3}
+.pk-my .m{font-size:17px;font-weight:700;color:var(--ink)}
+.pk-my .m em{font-style:normal;color:var(--ink-soft);font-weight:500;font-size:13px}
+.pk-my .y{font-size:11.5px;color:var(--ink-soft);font-weight:600}
+.pk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.pk-dow{text-align:center;font-size:11px;font-weight:700;color:var(--ink-soft);padding:7px 0}
+.pk-dow.we{color:var(--yellow-dark)}
+.pk-d{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--ink);border:1.5px solid transparent}
+.pk-d:active{background:var(--canvas)}
+.pk-d.mut{color:#DDE4EF;pointer-events:none}
+.pk-d.we{color:var(--navy-mid)}
+.pk-d.today{border-color:var(--navy-soft)}
+.pk-d.sel{background:linear-gradient(135deg,var(--navy),var(--navy-mid));color:#fff}
+.pk-foot{display:flex;gap:10px;padding:0 18px 18px}
+.pk-foot button{flex:1;padding:14px;border-radius:14px;font-weight:600;font-size:14px;font-family:inherit;line-height:1.25}
+.pk-foot .today-btn{background:var(--canvas);color:var(--navy)}
+.pk-foot .today-btn small,.pk-foot .ok-btn small{display:block;font-size:10px;font-weight:500;opacity:.7}
+.pk-foot .ok-btn{background:linear-gradient(180deg,var(--yellow-bright),var(--yellow-dark));color:var(--navy-deep)}
+.tp-cols{display:flex;gap:12px;align-items:stretch}
+.tp-col{flex:1;text-align:center}
+.tp-col-h{font-size:11px;font-weight:700;color:var(--ink-soft);margin-bottom:8px}
+.tp-col-h em{font-style:normal;font-weight:500}
+.tp-scroll{height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:16px;padding:6px;-webkit-overflow-scrolling:touch}
+.tp-scroll::-webkit-scrollbar{width:0}
+.tp-o{padding:11px;border-radius:11px;font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink-mid);margin-bottom:3px}
+.tp-o.on{background:linear-gradient(135deg,var(--navy),var(--navy-mid));color:#fff}
+.tp-sep{display:flex;align-items:center;font-size:26px;font-weight:700;color:var(--ink-soft);font-family:var(--mono)}
+.tp-quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.tp-quick button{flex:1;min-width:62px;padding:9px 6px;border-radius:11px;background:var(--canvas);color:var(--navy);font-size:12.5px;font-weight:600;font-family:inherit;line-height:1.3}
+.tp-quick button small{display:block;font-size:9px;opacity:.7;font-weight:500}
 </style>
 </head>
 <body>
@@ -246,6 +298,7 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <div class="sheet-bg" id="sheet-bg"><div class="sheet" id="sheet"></div></div>
+  <div class="pk" id="pk"><div class="pk-card" id="pk-card"></div></div>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -561,6 +614,77 @@ async function saveProfile(){
 }
 
 /* ===== SHEETS / FORMS ===== */
+/* ===================== BILINGUAL DATE / TIME PICKER (mobile) ===================== */
+const EN_MS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOW_EN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const I_CAL='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+const I_CLK='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>';
+function dateField(id,val){val=val||'';return `<input type="hidden" id="${id}" value="${val}"><button type="button" class="dtf-btn ${val?'':'empty'}" id="${id}-btn" onclick="openDP('${id}')"><span class="dtf-ic">${I_CAL}</span><span class="dtf-v">${dfLabel(val)}</span></button>`;}
+function dfLabel(val){if(!val)return '<span class="dtf-th">เลือกวันที่</span><span class="dtf-en">Select date</span>';const d=parse(val);return `<span class="dtf-th">${d.getDate()} ${THAI_M[d.getMonth()]} ${be(d.getFullYear())}</span><span class="dtf-en">${d.getDate()} ${EN_MS[d.getMonth()]} ${d.getFullYear()} · ${DOW_EN[d.getDay()]}</span>`;}
+function timeField(id,val){val=val||'';return `<input type="hidden" id="${id}" value="${val}"><button type="button" class="dtf-btn ${val?'':'empty'}" id="${id}-btn" onclick="openTP('${id}')"><span class="dtf-ic">${I_CLK}</span><span class="dtf-v">${tfLabel(val)}</span></button>`;}
+function tfLabel(val){if(!val)return '<span class="dtf-th">เลือกเวลา</span><span class="dtf-en">Select time</span>';const[h,m]=val.split(':').map(Number);const ap=h<12?'AM':'PM';const h12=(h%12)||12;return `<span class="dtf-th">${val} น.</span><span class="dtf-en">${h12}:${pad(m)} ${ap}</span>`;}
+function setDF(id,val){const inp=document.getElementById(id);if(inp)inp.value=val;const btn=document.getElementById(id+'-btn');if(btn){btn.classList.toggle('empty',!val);btn.querySelector('.dtf-v').innerHTML=/-(st|et)$/.test(id)?tfLabel(val):dfLabel(val);}}
+let _dpId=null,_dpY,_dpM,_dpSel;
+function openDP(id){_dpId=id;const cur=document.getElementById(id).value||TODAY;const d=parse(cur);_dpY=d.getFullYear();_dpM=d.getMonth();_dpSel=document.getElementById(id).value||'';renderDP();document.getElementById('pk').classList.add('open');}
+function dpStep(n){_dpM+=n;if(_dpM>11){_dpM=0;_dpY++;}if(_dpM<0){_dpM=11;_dpY--;}renderDP();}
+function dpPick(ds){_dpSel=ds;renderDP();}
+function renderDP(){
+  const dim=daysIn(_dpY,_dpM),first=new Date(_dpY,_dpM,1).getDay();
+  let cells='';for(let i=0;i<7;i++)cells+=`<div class="pk-dow ${i===0||i===6?'we':''}">${DOW_TH[i]}</div>`;
+  for(let i=0;i<first;i++)cells+='<div class="pk-d mut"></div>';
+  for(let dd=1;dd<=dim;dd++){const ds=_dpY+'-'+pad(_dpM+1)+'-'+pad(dd);const dow=new Date(_dpY,_dpM,dd).getDay();
+    const cls=['pk-d'];if(dow===0||dow===6)cls.push('we');if(ds===TODAY)cls.push('today');if(ds===_dpSel)cls.push('sel');
+    cells+=`<div class="${cls.join(' ')}" onclick="dpPick('${ds}')">${dd}</div>`;}
+  const sd=_dpSel?parse(_dpSel):null;
+  document.getElementById('pk-card').innerHTML=`
+  <div class="pk-head"><div class="pk-x" onclick="closePK()">${I.x}</div>
+    <div class="pk-cap">เลือกวันที่ · Select Date</div>
+    <div class="pk-th">${sd?sd.getDate()+' '+THAI_M[sd.getMonth()]+' '+be(sd.getFullYear()):'ยังไม่เลือก'}</div>
+    <div class="pk-en">${sd?DOW_EN[sd.getDay()]+', '+sd.getDate()+' '+EN_MS[sd.getMonth()]+' '+sd.getFullYear():'No date selected'}</div></div>
+  <div class="pk-body">
+    <div class="pk-nav"><button onclick="dpStep(-1)">${I.chevL}</button>
+      <div class="pk-my"><div class="m">${THAI_M[_dpM]} <em>${EN_MS[_dpM]}</em></div><div class="y">พ.ศ. ${be(_dpY)} · ค.ศ. ${_dpY}</div></div>
+      <button onclick="dpStep(1)">${I.chevR}</button></div>
+    <div class="pk-grid">${cells}</div></div>
+  <div class="pk-foot"><button class="today-btn" onclick="dpPick('${TODAY}')">วันนี้<small>Today</small></button>
+    <button class="ok-btn" onclick="dpConfirm()">ตกลง<small>Confirm</small></button></div>`;
+}
+function dpConfirm(){if(_dpSel)setDF(_dpId,_dpSel);closePK();}
+let _tpId=null,_tpH,_tpM;
+function openTP(id){_tpId=id;const cur=document.getElementById(id).value;if(cur){const[h,m]=cur.split(':').map(Number);_tpH=h;_tpM=m;}else{_tpH=9;_tpM=0;}renderTP();document.getElementById('pk').classList.add('open');}
+function tpSetH(h){_tpH=h;renderTP();}
+function tpSetM(m){_tpM=m;renderTP();}
+function tpQuick(h,m){_tpH=h;_tpM=m;renderTP();}
+function renderTP(){
+  let hrs='';for(let h=0;h<24;h++)hrs+=`<div class="tp-o ${h===_tpH?'on':''}" onclick="tpSetH(${h})" id="tph-${h}">${pad(h)}</div>`;
+  let mins='';for(let m=0;m<60;m+=5)mins+=`<div class="tp-o ${m===_tpM?'on':''}" onclick="tpSetM(${m})" id="tpm-${m}">${pad(m)}</div>`;
+  const ap=_tpH<12?'AM':'PM',h12=(_tpH%12)||12;
+  document.getElementById('pk-card').innerHTML=`
+  <div class="pk-head"><div class="pk-x" onclick="closePK()">${I.x}</div>
+    <div class="pk-cap">เลือกเวลา · Select Time</div>
+    <div class="pk-th">${pad(_tpH)}:${pad(_tpM)} น.</div>
+    <div class="pk-en">${h12}:${pad(_tpM)} ${ap}</div></div>
+  <div class="pk-body">
+    <div class="tp-cols">
+      <div class="tp-col"><div class="tp-col-h">ชั่วโมง <em>Hour</em></div><div class="tp-scroll" id="tp-hs">${hrs}</div></div>
+      <div class="tp-sep">:</div>
+      <div class="tp-col"><div class="tp-col-h">นาที <em>Minute</em></div><div class="tp-scroll" id="tp-ms">${mins}</div></div>
+    </div>
+    <div class="tp-quick">
+      <button onclick="tpQuick(9,0)">09:00<small>เช้า</small></button>
+      <button onclick="tpQuick(12,0)">12:00<small>เที่ยง</small></button>
+      <button onclick="tpQuick(13,0)">13:00<small>บ่าย</small></button>
+      <button onclick="tpQuick(18,0)">18:00<small>เย็น</small></button>
+    </div></div>
+  <div class="pk-foot"><button class="today-btn" onclick="tpNow()">ตอนนี้<small>Now</small></button>
+    <button class="ok-btn" onclick="tpConfirm()">ตกลง<small>Confirm</small></button></div>`;
+  setTimeout(()=>{try{const eh=document.getElementById('tph-'+_tpH),em=document.getElementById('tpm-'+_tpM);if(eh&&eh.scrollIntoView)eh.scrollIntoView({block:'center'});if(em&&em.scrollIntoView)em.scrollIntoView({block:'center'});}catch(e){}},0);
+}
+function tpNow(){const n=new Date();_tpH=n.getHours();_tpM=Math.round(n.getMinutes()/5)*5%60;renderTP();}
+function tpConfirm(){setDF(_tpId,pad(_tpH)+':'+pad(_tpM));closePK();}
+function closePK(){document.getElementById('pk').classList.remove('open');}
+document.getElementById('pk').addEventListener('click',e=>{if(e.target.id==='pk')closePK();});
+
 function openSheet(title,body){
   document.getElementById('sheet').innerHTML=`<div class="sheet-grip"></div><div class="sheet-h"><h3>${title}</h3><button class="x" onclick="closeSheet()">${I.x}</button></div><div class="sheet-b">${body}</div>`;
   document.getElementById('sheet-bg').classList.add('open');
@@ -585,7 +709,7 @@ function openForm(group){
     openSheet('แจ้งลา',`
       <div class="field"><label>ประเภทการลา</label><div class="type-grid" id="type-grid">
         ${['sick','personal','other','vacation'].map(k=>typeOpt(k)).join('')}</div></div>
-      <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
+      <div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('f-start',today)}</div><div class="field"><label>ถึงวันที่</label>${dateField('f-end',today)}</div></div>
       <div class="field"><label>เหตุผล</label><textarea id="f-note" placeholder="ระบุเหตุผล"></textarea></div>
       ${submitBtn('submitLeave()')}`);
   } else if(group==='training'){formType='internal';
@@ -593,8 +717,8 @@ function openForm(group){
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['internal','esv','event'].map(k=>typeOpt(k)).join('')}</div></div>
       <div class="field"><label>ชื่อหัวข้อ / กิจกรรม</label><input id="f-title" placeholder="เช่น อบรม Security ภายใน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น ห้องประชุม A / ศูนย์ ESV"></div>
-      <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
-      <div class="row2"><div class="field"><label>เวลาเริ่ม</label><input type="time" id="f-st"></div><div class="field"><label>เวลาสิ้นสุด</label><input type="time" id="f-et"></div></div>
+      <div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('f-start',today)}</div><div class="field"><label>ถึงวันที่</label>${dateField('f-end',today)}</div></div>
+      <div class="row2"><div class="field"><label>เวลาเริ่ม</label>${timeField('f-st','')}</div><div class="field"><label>เวลาสิ้นสุด</label>${timeField('f-et','')}</div></div>
       ${submitBtn('submitTrain()')}`);
   } else if(group==='task'){formType='task';
     openSheet('มอบหมายงาน (Task Assignment)',`
@@ -602,7 +726,7 @@ function openForm(group){
       <div class="field hidden" id="t-build-custom"><label>ระบุอาคาร (อื่นๆ)</label><input id="t-build-other" placeholder="ชื่ออาคาร/สถานที่"></div>
       <div class="field"><label>ประเภทงาน</label><select id="t-type" onchange="taskTypeToggleM()">${TASKS.map((t,i)=>`<option value="${i}">${t.th} / ${t.en}</option>`).join('')}</select></div>
       <div class="field hidden" id="t-type-custom"><label>ระบุประเภทงาน (อื่นๆ)</label><input id="t-type-other" placeholder="ระบุงานที่มอบหมาย"></div>
-      <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
+      <div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('f-start',today)}</div><div class="field"><label>ถึงวันที่</label>${dateField('f-end',today)}</div></div>
       <div class="field"><label>รายละเอียดเพิ่มเติม</label><textarea id="f-note" placeholder="รายละเอียดงาน / ผู้ประสานงาน / หมายเหตุ"></textarea></div>
       ${submitBtn('submitTask()')}`);
   } else { // overtime or offsite
@@ -611,8 +735,8 @@ function openForm(group){
       <div class="field"><label>ประเภท</label><div class="type-grid" id="type-grid">${['overtime','offsite'].map(k=>typeOpt(k,'otToggle')).join('')}</div></div>
       <div class="field"><label>ชื่องาน</label><input id="f-title" placeholder="เช่น ปิดยอดสิ้นเดือน"></div>
       <div class="field"><label>สถานที่</label><input id="f-loc" placeholder="เช่น สำนักงาน / ชลบุรี"></div>
-      <div class="row2"><div class="field"><label>วันที่เริ่ม</label><input type="date" id="f-start" value="${today}"></div><div class="field"><label>ถึงวันที่</label><input type="date" id="f-end" value="${today}"></div></div>
-      <div class="row2"><div class="field"><label>เวลาเริ่ม</label><input type="time" id="f-st"></div><div class="field"><label>เวลาสิ้นสุด</label><input type="time" id="f-et"></div></div>
+      <div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('f-start',today)}</div><div class="field"><label>ถึงวันที่</label>${dateField('f-end',today)}</div></div>
+      <div class="row2"><div class="field"><label>เวลาเริ่ม</label>${timeField('f-st','')}</div><div class="field"><label>เวลาสิ้นสุด</label>${timeField('f-et','')}</div></div>
       <div id="offsite-extra" class="${group==='offsite'?'':'hidden'}">
         <div class="toggle-row"><div><div class="l">ค้างคืน</div><div class="s">ค้างคืนนอกสถานที่</div></div><div class="tg" id="f-overnight" onclick="this.classList.toggle('on')"></div></div>
         <div class="toggle-row"><div><div class="l">มีค่าใช้จ่าย</div><div class="s">เปิดเพื่อกรอกจำนวนเงิน</div></div><div class="tg" id="f-hascost" onclick="this.classList.toggle('on');document.getElementById('cost-wrap').classList.toggle('hidden',!this.classList.contains('on'))"></div></div>
