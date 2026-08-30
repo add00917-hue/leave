@@ -155,6 +155,10 @@ input,select,textarea{font-family:inherit}
 /* ===== SHEET (bottom modal) ===== */
 .sheet-bg{position:absolute;inset:0;background:rgba(7,24,46,.5);z-index:60;display:none;align-items:flex-end}
 .sheet-bg.open{display:flex;animation:fade .2s}
+.sheet-bg.center{align-items:center;justify-content:center;padding:20px}
+.sheet-bg.center .sheet{width:100%;max-width:400px;max-height:86%;border-radius:24px;animation:pkpop .3s cubic-bezier(.16,1,.3,1)}
+.sheet-bg.center .sheet-grip{display:none}
+.sheet-bg.center .sheet-h{border-radius:24px 24px 0 0}
 .sheet{background:#fff;width:100%;max-height:92%;border-radius:26px 26px 0 0;overflow-y:auto;animation:up .32s cubic-bezier(.16,1,.3,1)}
 @keyframes up{from{transform:translateY(100%)}to{transform:none}}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
@@ -542,7 +546,7 @@ function openDay(ds){const recs=recOn(ds);const d=parse(ds);const hol=holiName(d
   openSheet(`${d.getDate()} ${THAI_M[d.getMonth()]} ${be(d.getFullYear())}`,
     `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(r=>{const e=emp(r.emp);return `<div class="rec-item" style="border:1px solid var(--line);border-radius:14px"><div class="bar" style="background:${CATX(r).c}"></div>
       <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${esc(e.name)} • ${r.st?r.st+(r.et?'-'+r.et:'')+' • ':''}${r.location?esc(r.location):'—'}</div></div>
-      <span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`);
+      <span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`,true);
 }
 
 /* ===== MY LIST ===== */
@@ -564,7 +568,18 @@ function openRec(id){const r=records.find(x=>x.id===id);
     ${r.location?`<div class="prof-row"><div class="ic">${I.pin}</div><div><div class="l" style="font-size:13px">${esc(r.location)}</div><div class="v">สถานที่</div></div></div>`:''}
     ${r.cat==='offsite'?`<div class="prof-row"><div class="ic">${I.pin}</div><div><div class="l" style="font-size:13px">${r.overnight?'ค้างคืน':'ไปกลับ'} • ${r.cost!=null?'฿'+Number(r.cost).toLocaleString():'ไม่มีค่าใช้จ่าย'}</div><div class="v">ค้างคืน / ค่าใช้จ่าย</div></div></div>`:''}
     ${r.note?`<div class="prof-row"><div class="ic">${I.inbox}</div><div><div class="l" style="font-size:13px">${esc(r.note)}</div><div class="v">หมายเหตุ</div></div></div>`:''}
-    ${r.status==='pending'?`<button class="submit" style="background:var(--danger-bg);color:var(--danger);box-shadow:none;margin-top:16px" onclick="records.find(x=>x.id==='${r.id}').status='cancelled';closeSheet();nav(curScr);toast('ยกเลิกคำขอแล้ว')">ยกเลิกคำขอ</button>`:''}`);
+    ${r.status==='pending'?`<button class="submit" style="background:var(--danger-bg);color:var(--danger);box-shadow:none;margin-top:16px" onclick="cancelReq('${r.id}')">ยกเลิกคำขอ</button>`:''}`,true);
+}
+async function cancelReq(id){
+  const r=records.find(x=>x.id===id);if(!r)return;const prev=r.status;
+  r.status='cancelled';closeSheet();nav(curScr);
+  if(CONFIG.SHEETS_API_URL){
+    try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'cancelRecord',id})});
+      const j=await res.json();
+      if(j&&j.ok)toast('ยกเลิกคำขอแล้ว');
+      else{r.status=prev;nav(curScr);toast('ยกเลิกไม่สำเร็จ • '+((j&&j.error)||'ลองใหม่'),'err');}
+    }catch(e){r.status=prev;nav(curScr);toast('ออฟไลน์ • ยังไม่ได้บันทึกการยกเลิก','err');}
+  }else toast('ยกเลิกคำขอแล้ว');
 }
 
 /* ===== PROFILE ===== */
@@ -685,8 +700,9 @@ function tpConfirm(){setDF(_tpId,pad(_tpH)+':'+pad(_tpM));closePK();}
 function closePK(){document.getElementById('pk').classList.remove('open');}
 document.getElementById('pk').addEventListener('click',e=>{if(e.target.id==='pk')closePK();});
 
-function openSheet(title,body){
+function openSheet(title,body,center){
   document.getElementById('sheet').innerHTML=`<div class="sheet-grip"></div><div class="sheet-h"><h3>${title}</h3><button class="x" onclick="closeSheet()">${I.x}</button></div><div class="sheet-b">${body}</div>`;
+  document.getElementById('sheet-bg').classList.toggle('center',!!center);
   document.getElementById('sheet-bg').classList.add('open');
 }
 function closeSheet(){document.getElementById('sheet-bg').classList.remove('open');}
@@ -759,9 +775,17 @@ async function submitTask(){
   const start=fv('f-start'),end=fv('f-end'),note=fv('f-note');
   if(!start){toast('กรุณาเลือกวันที่','err');return;}
   records.unshift(R(CUR.id,'task',start,end,{title,location:build,note,status:'none'}));
-  closeSheet();nav(curScr);toast('มอบหมายงานแล้ว');
-  if(CONFIG.SHEETS_API_URL){try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'createRecord',emp_id:CUR.id,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id})});}catch(e){}}
+  closeSheet();nav(curScr);
+  if(CONFIG.SHEETS_API_URL){
+    try{
+      const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'createRecord',emp_id:CUR.id,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id})});
+      const j=await res.json();
+      if(j&&j.ok)toast('มอบหมายงานและบันทึกลงระบบแล้ว');
+      else if(j&&/category/i.test(j.error||''))toast('บันทึกไม่สำเร็จ • ต้องอัปเดต (deploy) โค้ดฐานข้อมูลก่อน','err');
+      else toast('บันทึกลงระบบไม่สำเร็จ • '+((j&&j.error)||'ลองใหม่อีกครั้ง'),'err');
+    }catch(e){toast('ออฟไลน์ • ยังไม่ได้บันทึกลงระบบ','err');}
+  }else toast('มอบหมายงานแล้ว');
 }
 function submitLeave(){const cat=formType;
   records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'}));
