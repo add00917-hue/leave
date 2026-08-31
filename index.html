@@ -365,7 +365,9 @@ const I={
 };
 
 let employees=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
-const emp=id=>employees.find(e=>e.id===id)||{name:'-',dept:''};
+const emp=id=>employees.find(e=>e.id===id)||{name:'-',nick:'',dept:''};
+function dispName(id){const e=emp(id);return e.nick||(e.name||'-').split(' ')[0];}
+function isInactive(e){const s=String(e.status||'').toLowerCase().trim();return s==='inactive'||s==='ปิดใช้งาน'||s==='disabled'||s==='ปิด'||s==='ลาออก';}
 const AC=['#15396E','#2C5BA0','#0B7A55','#C0392B','#4F46E5','#D6418B','#0E9488'];
 function avaColor(id){id=String(id==null||id===''?'x':id);let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%AC.length;return AC[h];}
 let _profPhoto='';
@@ -377,8 +379,8 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','
 
 let rid=2400;
 function R(empId,cat,start,end,o){o=o||{};return Object.assign({id:(cat==='overtime'?'OT-':cat==='offsite'?'OS-':cat==='task'?'TA-':CAT[cat].g==='leave'?'LV-':'AC-')+(++rid),
-  emp:empId,cat,start,end:end||start,title:o.title||CAT[cat].th,location:o.location||'',st:o.st||'',et:o.et||'',
-  status:CAT[cat].approve?(o.status||'pending'):'none',overnight:o.overnight||false,cost:o.cost!=null?o.cost:null,note:o.note||''},o);}
+  emp:empId||'',cat,start,end:end||start,title:o.title||CAT[cat].th,location:o.location||'',st:o.st||'',et:o.et||'',
+  status:o.status!==undefined?o.status:(CAT[cat].approve?'pending':'none'),overnight:o.overnight||false,cost:o.cost!=null?o.cost:null,note:o.note||'',pendingEmp:'',reqBy:''},o);}
 let records=[]; // โหลดจากฐานข้อมูลจริงเท่านั้น
 let CUR=employees[0];
 let holidays=[
@@ -416,7 +418,7 @@ async function doLogin(){
       const j=await res.json();
       if(j&&j.ok&&j.data&&j.data.emp_id){
         const S=v=>v==null?'':String(v).trim();
-        CUR={id:S(j.data.emp_id),name:S(j.data.full_name),dept:S(j.data.dept),pos:S(j.data.position),role:S(j.data.role).toLowerCase()||'user',user:S(j.data.username)||u,pass:p,photo:S(j.data.photo)};
+        CUR={id:S(j.data.emp_id),name:S(j.data.full_name),nick:S(j.data.nickname),dept:S(j.data.dept),pos:S(j.data.position),role:S(j.data.role).toLowerCase()||'user',user:S(j.data.username)||u,pass:p,photo:S(j.data.photo)};
         DBS='online';lgBusy(false);lgStatus('');enterAppUI();syncDBm();return;
       }
       if(j&&j.ok===false){lgBusy(false);lgStatus(j.error||'ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง','err');return;}
@@ -479,8 +481,8 @@ async function syncDBm(){
         if(v.indexOf('T')>0&&(v.slice(-1)==='Z'||/[+-]\d{2}:\d{2}$/.test(v))){const dt=new Date(v);return new Date(dt.getTime()+7*3600*1000).toISOString().slice(0,10);} // แปลง UTC → เวลาไทย กันวันเลื่อน
         return v.slice(0,10);};
       const S=v=>v==null?'':String(v).trim(); // Sheets ส่งชนิดข้อมูลปนกัน ต้องบังคับเป็น string
-      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:S(e.emp_id),name:S(e.full_name),dept:S(e.dept),pos:S(e.position),role:S(e.role).toLowerCase()||'user',user:S(e.username),pass:S(e.password_hash),photo:S(e.photo)}));
-      if(Array.isArray(d.records)) records=d.records.map(r=>({id:S(r.record_id),emp:S(r.emp_id),cat:S(r.category).toLowerCase(),start:D(r.start_date),end:D(r.end_date||r.start_date),title:S(r.title),location:S(r.location),st:S(r.start_time),et:S(r.end_time),status:S(r.status).toLowerCase()||'none',overnight:r.overnight===true||S(r.overnight).toUpperCase()==='TRUE',cost:(r.cost===''||r.cost==null||isNaN(Number(r.cost)))?null:Number(r.cost),note:S(r.note)})).filter(r=>CAT[r.cat]&&r.start);
+      if(Array.isArray(d.employees)) employees=d.employees.map(e=>({id:S(e.emp_id),name:S(e.full_name),nick:S(e.nickname),dept:S(e.dept),pos:S(e.position),role:S(e.role).toLowerCase()||'user',user:S(e.username),pass:S(e.password_hash),photo:S(e.photo)}));
+      if(Array.isArray(d.records)) records=d.records.map(r=>({id:S(r.record_id),emp:S(r.emp_id),cat:S(r.category).toLowerCase(),start:D(r.start_date),end:D(r.end_date||r.start_date),title:S(r.title),location:S(r.location),st:S(r.start_time),et:S(r.end_time),status:S(r.status).toLowerCase()||'none',overnight:r.overnight===true||S(r.overnight).toUpperCase()==='TRUE',cost:(r.cost===''||r.cost==null||isNaN(Number(r.cost)))?null:Number(r.cost),note:S(r.note),pendingEmp:S(r.pending_emp_id),reqBy:S(r.req_by)})).filter(r=>CAT[r.cat]&&r.start);
       if(Array.isArray(d.holidays)) holidays=d.holidays.map(h=>({date:D(h.date),name:S(h.name),type:S(h.type)||'public'}));
       const meNow=employees.find(e=>e.id===CUR.id);
       if(meNow){ // ข้อมูลจากชีตคือความจริง — ชื่อ/รูป/บทบาทบนหัวแอปต้องตรงเสมอ
@@ -504,6 +506,7 @@ function renderHome(){
     <div class="qstat a"><b class="mono">${pend}</b><span>รออนุมัติ</span></div>
     <div class="qstat g"><b class="mono">${todayMine}</b><span>วันนี้</span></div>
   </div>
+  ${taskHomeSection()}
   <div class="sec-h"><h3>แจ้งรายการใหม่</h3></div>
   <div class="qa-grid">
     ${qa('leave','#15396E',I.cal,'แจ้งลา','ป่วย/กิจ/อื่นๆ/พักร้อน')}
@@ -515,6 +518,80 @@ function renderHome(){
   <div class="card">${upcoming.length?upcoming.map(recRow).join(''):emptyHTML('ไม่มีรายการที่กำลังจะถึง')}</div>`;
 }
 function qa(type,color,icon,t,s){return `<button class="qa" onclick="openForm('${type}')"><div class="ic" style="background:${color}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div></button>`;}
+/* ===== Task Assignment section (หน้า home) ===== */
+function canApproveM(){return !!(CUR&&(CUR.role==='admin'||CUR.role==='approver'));}
+function taskStColorM(r){return r.status==='open'?'#F59E0B':(r.pendingEmp?'#3B82F6':'#7C3AED');}
+function taskHomeSection(){
+  const ts=records.filter(r=>r.cat==='task');
+  if(!ts.length&&!canApproveM())return '';
+  const open=ts.filter(r=>r.status==='open'||!r.emp).sort((a,b)=>a.start<b.start?-1:1);
+  const reqs=canApproveM()?ts.filter(r=>r.pendingEmp):[];
+  const mine=ts.filter(r=>r.emp===CUR.id&&r.status!=='open').sort((a,b)=>a.start<b.start?-1:1).slice(0,3);
+  let html=`<div class="sec-h"><h3>งานมอบหมาย (Task)</h3>${canApproveM()?`<a onclick="openTaskFormM()">+ เปิดงานใหม่</a>`:''}</div>`;
+  // ช่องแจ้งงาน: คำขอเปลี่ยนผู้รับผิดชอบ (ผู้อนุมัติ/ผู้ดูแล)
+  if(reqs.length)html+=`<div class="card" style="border:1px solid #3B82F644;background:#EFF6FF;margin-bottom:12px"><div style="padding:12px 14px 6px;font-weight:700;font-size:13px;color:#1D4ED8">🔄 คำขอเปลี่ยนผู้รับผิดชอบ (${reqs.length})</div>${reqs.map(r=>`
+    <div class="rec-item"><div class="bar" style="background:#3B82F6"></div><div class="rec-b" style="flex:1">
+      <div class="rec-t">${esc(r.title)}</div>
+      <div class="rec-m">${esc(dispName(r.emp))} → <b>${esc(dispName(r.reqBy))}</b> ขอรับผิดชอบ</div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="chip" style="background:var(--success-bg);color:#0B7A55" onclick="decideReassignM('${r.id}','approved')">✓ อนุมัติ</button><button class="chip" onclick="decideReassignM('${r.id}','rejected')">✕ ปฏิเสธ</button></div>
+    </div></div>`).join('')}</div>`;
+  // งานว่าง กดรับได้
+  if(open.length)html+=`<div class="card" style="border:1px solid #F59E0B44;background:#FFFBEB;margin-bottom:12px"><div style="padding:12px 14px 6px;font-weight:700;font-size:13px;color:#B45309">📋 งานว่าง — กดรับได้ (${open.length})</div>${open.slice(0,4).map(r=>`
+    <div class="rec-item"><div class="bar" style="background:#F59E0B"></div><div class="rec-b" style="flex:1">
+      <div class="rec-t">${esc(r.title)}</div>
+      <div class="rec-m">${r.location?esc(r.location)+' • ':''}${fmtTH(r.start)}</div>
+      <button class="chip" style="background:var(--navy);color:#fff;margin-top:8px" onclick="claimTaskM('${r.id}')">${I.check} กดรับงานนี้</button>
+    </div></div>`).join('')}</div>`;
+  // งานของฉัน
+  if(mine.length)html+=`<div class="card">${mine.map(r=>`<div class="rec-item" onclick="openRec('${r.id}')"><div class="bar" style="background:#7C3AED"></div>
+    <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${r.location?esc(r.location)+' • ':''}${fmtTH(r.start)}</div></div>
+    <span class="cat-pill" style="background:#7C3AED">งานของฉัน</span></div>`).join('')}</div>`;
+  if(!open.length&&!reqs.length&&!mine.length)html+=`<div class="card"><div class="empty" style="padding:20px">${I.check}<h4>ไม่มีงานมอบหมาย</h4></div></div>`;
+  return html;
+}
+/* ---- Task workflow (มือถือ) ---- */
+async function taskPostM(payload,okMsg,revert){
+  if(!CONFIG.SHEETS_API_URL){toast(okMsg);nav('home');return;}
+  try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    const j=await res.json();
+    if(j&&j.ok){toast(okMsg);}else{revert&&revert();toast((j&&j.error)||'ทำรายการไม่สำเร็จ','err');}
+  }catch(e){revert&&revert();toast('ออฟไลน์ • ทำรายการไม่สำเร็จ','err');}
+  nav('home');
+}
+async function claimTaskM(id){const r=records.find(x=>x.id===id);if(!r)return;const p={emp:r.emp,status:r.status};
+  r.emp=CUR.id;r.status='none';nav('home');
+  await taskPostM({action:'claimTask',id,emp_id:CUR.id},'รับงานเรียบร้อย • คุณเป็นผู้รับผิดชอบแล้ว',()=>{r.emp=p.emp;r.status=p.status;});}
+async function reqReassignM(id){const r=records.find(x=>x.id===id);if(!r)return;const p=r.pendingEmp;
+  r.pendingEmp=CUR.id;r.reqBy=CUR.id;closeSheet();nav('home');
+  await taskPostM({action:'requestReassign',id,emp_id:CUR.id},'ส่งคำขอเปลี่ยนผู้รับผิดชอบแล้ว • รอผู้อนุมัติ',()=>{r.pendingEmp=p;});}
+async function decideReassignM(id,decision){const r=records.find(x=>x.id===id);if(!r)return;const p={emp:r.emp,pending:r.pendingEmp};
+  if(decision==='approved'&&r.pendingEmp)r.emp=r.pendingEmp;r.pendingEmp='';r.reqBy='';nav('home');
+  await taskPostM({action:'decideReassign',id,decision,approver_id:CUR.id},decision==='approved'?'อนุมัติเปลี่ยนผู้รับผิดชอบแล้ว':'ปฏิเสธคำขอแล้ว',()=>{r.emp=p.emp;r.pendingEmp=p.pending;});}
+/* ผู้ดูแล/ผู้อนุมัติเปิดงานว่างจากมือถือ */
+function openTaskFormM(){
+  openSheet('เปิดงาน Task ใหม่',`
+    <div class="field"><label>อาคาร</label><select id="tm-build" onchange="tmBuildToggle()">${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select></div>
+    <div class="field hidden" id="tm-build-c"><label>ระบุอาคาร</label><input id="tm-build-o" placeholder="ชื่ออาคาร/สถานที่"></div>
+    <div class="field"><label>ประเภทงาน</label><select id="tm-type" onchange="tmTypeToggle()">${TASKS.map((t,i)=>`<option value="${i}">${t.th} / ${t.en}</option>`).join('')}</select></div>
+    <div class="field hidden" id="tm-type-c"><label>ระบุประเภทงาน</label><input id="tm-type-o" placeholder="ระบุงาน"></div>
+    <div class="field"><label>ผู้รับผิดชอบ</label><select id="tm-emp"><option value="">— เปิดงานไว้ (ให้กดรับเอง) —</option>${employees.filter(e=>!isInactive(e)).map(e=>`<option value="${e.id}">${esc(e.nick?e.nick+' ('+e.name+')':e.name)}</option>`).join('')}</select></div>
+    <div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('tm-start',TODAY)}</div><div class="field"><label>ถึงวันที่</label>${dateField('tm-end',TODAY)}</div></div>
+    <div class="field"><label>รายละเอียด</label><textarea id="tm-note" placeholder="หมายเหตุ"></textarea></div>
+    ${submitBtn('submitTaskM()')}`,true);
+}
+function tmBuildToggle(){const c=document.getElementById('tm-build-c');if(c)c.classList.toggle('hidden',fv('tm-build')!=='อื่นๆ');}
+function tmTypeToggle(){const c=document.getElementById('tm-type-c');if(c)c.classList.toggle('hidden',TASKS[+fv('tm-type')].th!=='อื่นๆ');}
+async function submitTaskM(){
+  let build=fv('tm-build');if(build==='อื่นๆ')build=(fv('tm-build-o')||'').trim()||'อื่นๆ';
+  const ti=+fv('tm-type');const title=TASKS[ti].th==='อื่นๆ'?((fv('tm-type-o')||'').trim()||'อื่นๆ'):(TASKS[ti].th+' / '+TASKS[ti].en);
+  const empId=fv('tm-emp'),start=fv('tm-start'),end=fv('tm-end'),note=fv('tm-note');
+  if(!start){toast('กรุณาเลือกวันที่','err');return;}
+  records.unshift(R(empId,'task',start,end,{title,location:build,note,status:empId?'none':'open'}));
+  closeSheet();nav('home');
+  if(CONFIG.SHEETS_API_URL){try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({action:'createRecord',emp_id:empId,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id})});toast(empId?'มอบหมายงานแล้ว':'เปิดงานไว้ให้กดรับแล้ว');}catch(e){toast('ออฟไลน์','err');}}
+  else toast('บันทึกงานแล้ว');
+}
 function CATX(r){return CAT[r.cat]||{c:'#8896AB',th:r.cat||'อื่นๆ',g:'other'};}
 function recRow(r){return `<div class="rec-item"><div class="bar" style="background:${CATX(r).c}"></div>
   <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}${r.location?' • '+esc(r.location):''}</div></div>
@@ -545,7 +622,7 @@ function calStep(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--
 function openDay(ds){const recs=recOn(ds);const d=parse(ds);const hol=holiName(ds);
   openSheet(`${d.getDate()} ${THAI_M[d.getMonth()]} ${be(d.getFullYear())}`,
     `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(r=>{const e=emp(r.emp);return `<div class="rec-item" style="border:1px solid var(--line);border-radius:14px"><div class="bar" style="background:${CATX(r).c}"></div>
-      <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${esc(e.name)} • ${r.st?r.st+(r.et?'-'+r.et:'')+' • ':''}${r.location?esc(r.location):'—'}</div></div>
+      <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${r.emp?esc(dispName(r.emp)):'งานว่าง'} • ${r.st?r.st+(r.et?'-'+r.et:'')+' • ':''}${r.location?esc(r.location):'—'}</div></div>
       <span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`,true);
 }
 
@@ -567,7 +644,12 @@ function openRec(id){const r=records.find(x=>x.id===id);
     <div class="prof-row"><div class="ic">${I.cal}</div><div><div class="l" style="font-size:13px">${fmtTH(r.start)}${r.end!==r.start?' – '+fmtTH(r.end):''}</div><div class="v">วันที่</div></div></div>
     ${r.location?`<div class="prof-row"><div class="ic">${I.pin}</div><div><div class="l" style="font-size:13px">${esc(r.location)}</div><div class="v">สถานที่</div></div></div>`:''}
     ${r.cat==='offsite'?`<div class="prof-row"><div class="ic">${I.pin}</div><div><div class="l" style="font-size:13px">${r.overnight?'ค้างคืน':'ไปกลับ'} • ${r.cost!=null?'฿'+Number(r.cost).toLocaleString():'ไม่มีค่าใช้จ่าย'}</div><div class="v">ค้างคืน / ค่าใช้จ่าย</div></div></div>`:''}
+    ${r.cat==='task'&&r.emp?`<div class="prof-row"><div class="ic">${I.user}</div><div><div class="l" style="font-size:13px">${esc(dispName(r.emp))} <span style="color:var(--ink-soft)">(${esc(emp(r.emp).name)})</span></div><div class="v">ผู้รับผิดชอบ</div></div></div>`:''}
+    ${r.cat==='task'&&r.pendingEmp?`<div class="holi-tip" style="background:#EFF6FF;color:#1D4ED8">⏳ ${esc(dispName(r.reqBy))} ขอเปลี่ยนเป็นผู้รับผิดชอบ • รออนุมัติ</div>`:''}
     ${r.note?`<div class="prof-row"><div class="ic">${I.inbox}</div><div><div class="l" style="font-size:13px">${esc(r.note)}</div><div class="v">หมายเหตุ</div></div></div>`:''}
+    ${r.cat==='task'&&(r.status==='open'||!r.emp)&&CUR?`<button class="submit" style="margin-top:16px" onclick="claimTaskM('${r.id}')">${I.check} กดรับงานนี้</button>`:''}
+    ${r.cat==='task'&&r.emp&&CUR&&r.emp!==CUR.id&&!r.pendingEmp?`<button class="submit" style="background:var(--navy);margin-top:16px" onclick="reqReassignM('${r.id}')">${I.check} ขอเปลี่ยนเป็นผู้รับผิดชอบ</button>`:''}
+    ${r.cat==='task'&&r.pendingEmp&&canApproveM()?`<div style="display:flex;gap:8px;margin-top:16px"><button class="submit" style="flex:1;background:var(--success)" onclick="decideReassignM('${r.id}','approved')">✓ อนุมัติเปลี่ยน</button><button class="submit" style="flex:1;background:var(--danger-bg);color:var(--danger);box-shadow:none" onclick="decideReassignM('${r.id}','rejected')">✕ ปฏิเสธ</button></div>`:''}
     ${r.status==='pending'?`<button class="submit" style="background:var(--danger-bg);color:var(--danger);box-shadow:none;margin-top:16px" onclick="cancelReq('${r.id}')">ยกเลิกคำขอ</button>`:''}`,true);
 }
 async function cancelReq(id){
