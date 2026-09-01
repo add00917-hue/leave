@@ -250,6 +250,20 @@ input,select,textarea{font-family:inherit}
 .tp-quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .tp-quick button{flex:1;min-width:62px;padding:9px 6px;border-radius:11px;background:var(--canvas);color:var(--navy);font-size:12.5px;font-weight:600;font-family:inherit;line-height:1.3}
 .tp-quick button small{display:block;font-size:9px;opacity:.7;font-weight:500}
+.savepop{position:absolute;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(7,24,46,.55);backdrop-filter:blur(4px)}
+.savepop.open{display:flex}
+.savepop-card{background:#fff;border-radius:24px;width:100%;max-width:320px;padding:32px 26px;text-align:center;box-shadow:0 30px 70px rgba(7,24,46,.5);animation:pkpop .3s cubic-bezier(.16,1,.3,1)}
+.savepop-ic{width:72px;height:72px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.savepop-ic svg{width:36px;height:36px}
+.savepop.saving .savepop-ic{background:var(--canvas)}
+.savepop.ok .savepop-ic{background:var(--success-bg);color:#0B7A55}
+.savepop.err .savepop-ic{background:var(--danger-bg);color:#C0392B}
+.savepop-spin{width:40px;height:40px;border:4px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.savepop-th{font-size:18px;font-weight:700;color:var(--ink)}
+.savepop-en{font-size:12px;color:var(--ink-soft);margin-top:4px}
+.savepop-sub{font-size:13px;color:var(--ink-mid);margin-top:10px;line-height:1.5}
+.savepop-btn{margin-top:18px;padding:13px 26px;border-radius:14px;background:var(--navy);color:#fff;font-weight:600;font-size:14px;font-family:inherit;width:100%}
 </style>
 </head>
 <body>
@@ -303,6 +317,7 @@ input,select,textarea{font-family:inherit}
 
   <div class="sheet-bg" id="sheet-bg"><div class="sheet" id="sheet"></div></div>
   <div class="pk" id="pk"><div class="pk-card" id="pk-card"></div></div>
+  <div class="savepop" id="savepop"><div class="savepop-card" id="savepop-card"></div></div>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -586,11 +601,8 @@ async function submitTaskM(){
   const ti=+fv('tm-type');const title=TASKS[ti].th==='อื่นๆ'?((fv('tm-type-o')||'').trim()||'อื่นๆ'):(TASKS[ti].th+' / '+TASKS[ti].en);
   const empId=fv('tm-emp'),start=fv('tm-start'),end=fv('tm-end'),note=fv('tm-note');
   if(!start){toast('กรุณาเลือกวันที่','err');return;}
-  records.unshift(R(empId,'task',start,end,{title,location:build,note,status:empId?'none':'open'}));
-  closeSheet();nav('home');
-  if(CONFIG.SHEETS_API_URL){try{await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({action:'createRecord',emp_id:empId,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id})});toast(empId?'มอบหมายงานแล้ว':'เปิดงานไว้ให้กดรับแล้ว');}catch(e){toast('ออฟไลน์','err');}}
-  else toast('บันทึกงานแล้ว');
+  saveRecordM({action:'createRecord',emp_id:empId,category:'task',title,location:build,start_date:start,end_date:end,note,actor:CUR.id},
+    R(empId,'task',start,end,{title,location:build,note,status:empId?'none':'open'}));
 }
 function CATX(r){return CAT[r.cat]||{c:'#8896AB',th:r.cat||'อื่นๆ',g:'other'};}
 function recRow(r){return `<div class="rec-item"><div class="bar" style="background:${CATX(r).c}"></div>
@@ -869,17 +881,42 @@ async function submitTask(){
     }catch(e){toast('ออฟไลน์ • ยังไม่ได้บันทึกลงระบบ','err');}
   }else toast('มอบหมายงานแล้ว');
 }
-function submitLeave(){const cat=formType;
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{note:fv('f-note'),status:CAT[cat].approve?'pending':'none'}));
-  closeSheet();nav(curScr);toast(CAT[cat].approve?'ส่งคำขอลาแล้ว รออนุมัติ':'บันทึกลาพักร้อนแล้ว');}
-function submitTrain(){const cat=formType;
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),status:CAT[cat].approve?'pending':'none'}));
-  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว');}
+function showSavingM(){document.getElementById('savepop').className='savepop open saving';
+  document.getElementById('savepop-card').innerHTML=`<div class="savepop-ic"><div class="savepop-spin"></div></div><div class="savepop-th">กำลังบันทึก...</div><div class="savepop-en">Saving to Google Sheet</div><div class="savepop-sub">กรุณารอสักครู่</div>`;}
+function showSavedM(ok,msg){const el=document.getElementById('savepop-card');
+  if(ok){document.getElementById('savepop').className='savepop open ok';
+    el.innerHTML=`<div class="savepop-ic">${I.check}</div><div class="savepop-th">บันทึกในระบบเรียบร้อย</div><div class="savepop-en">Saved to Google Sheet</div>`;
+    setTimeout(closeSavePop,1600);
+  }else{document.getElementById('savepop').className='savepop open err';
+    el.innerHTML=`<div class="savepop-ic">${I.x}</div><div class="savepop-th">บันทึกไม่สำเร็จ</div><div class="savepop-en">Not saved</div><div class="savepop-sub">${esc(msg||'ลองใหม่อีกครั้ง')}</div><button class="savepop-btn" onclick="closeSavePop()">ปิด</button>`;}}
+function closeSavePop(){document.getElementById('savepop').classList.remove('open');}
+async function saveRecordM(payload,localRec){
+  records.unshift(localRec); closeSheet(); nav(curScr);
+  if(!CONFIG.SHEETS_API_URL){toast('บันทึกแล้ว');return;}
+  showSavingM();
+  try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    const j=await res.json();
+    if(j&&j.ok){const dd=j.data||{};if(dd.record_id)localRec.id=String(dd.record_id);if(dd.status)localRec.status=String(dd.status).toLowerCase();nav(curScr);showSavedM(true);}
+    else if(j&&/category/i.test(j.error||''))showSavedM(false,'ต้อง deploy โค้ด Apps Script ใหม่ก่อน');
+    else showSavedM(false,(j&&j.error)||'ฐานข้อมูลไม่ตอบสนอง');
+  }catch(e){showSavedM(false,'เชื่อมต่อฐานข้อมูลไม่ได้');}
+}
+function submitLeave(){const cat=formType,start=fv('f-start'),end=fv('f-end'),note=fv('f-note');
+  if(!start){toast('กรุณาเลือกวันที่','err');return;}
+  saveRecordM({action:'createRecord',emp_id:CUR.id,category:cat,start_date:start,end_date:end,note,actor:CUR.id},
+    R(CUR.id,cat,start,end,{note,status:CAT[cat].approve?'pending':'none'}));}
+function submitTrain(){const cat=formType,start=fv('f-start'),end=fv('f-end'),title=fv('f-title')||CAT[cat].th,loc=fv('f-loc'),st=fv('f-st'),et=fv('f-et');
+  if(!start){toast('กรุณาเลือกวันที่','err');return;}
+  saveRecordM({action:'createRecord',emp_id:CUR.id,category:cat,title,location:loc,start_date:start,end_date:end,start_time:st,end_time:et,actor:CUR.id},
+    R(CUR.id,cat,start,end,{title,location:loc,st,et,status:CAT[cat].approve?'pending':'none'}));}
 function submitOT(){const cat=formType;const off=cat==='offsite';
   const overnight=off&&document.getElementById('f-overnight').classList.contains('on');
   const hasCost=off&&document.getElementById('f-hascost').classList.contains('on');
-  records.unshift(R(CUR.id,cat,fv('f-start'),fv('f-end'),{title:fv('f-title')||CAT[cat].th,location:fv('f-loc'),st:fv('f-st'),et:fv('f-et'),overnight,cost:hasCost?Number(fv('f-cost')||0):null,status:'pending'}));
-  closeSheet();nav(curScr);toast('บันทึกรายการแล้ว รออนุมัติ');}
+  const start=fv('f-start'),end=fv('f-end'),title=fv('f-title')||CAT[cat].th,loc=fv('f-loc'),st=fv('f-st'),et=fv('f-et');
+  const cost=hasCost?Number(fv('f-cost')||0):null;
+  if(!start){toast('กรุณาเลือกวันที่','err');return;}
+  saveRecordM({action:'createRecord',emp_id:CUR.id,category:cat,title,location:loc,start_date:start,end_date:end,start_time:st,end_time:et,overnight,cost:cost==null?'':cost,actor:CUR.id},
+    R(CUR.id,cat,start,end,{title,location:loc,st,et,overnight,cost,status:'pending'}));}
 
 function openHolidays(){
   const sorted=[...holidays].sort((a,b)=>a.date<b.date?-1:1); const byM={};
