@@ -12,7 +12,7 @@
 :root{
   --navy-deep:#07182E;--navy-dark:#0A2342;--navy:#15396E;--navy-mid:#2C5BA0;--navy-soft:#3D6BB0;
   --yellow:#FFC52E;--yellow-bright:#FFD449;--yellow-dark:#F4A810;--yellow-pale:#FFF6DE;
-  --canvas:#EEF2F8;--card:#FFFFFF;--ink:#0E2138;--ink-mid:#46587A;--ink-soft:#8593AC;--line:#E2E8F2;
+  --canvas:#F4F7FC;--card:#FFFFFF;--ink:#0E2138;--ink-mid:#46587A;--ink-soft:#8593AC;--line:#E2E8F2;
   --success:#10B981;--success-bg:#E7F8F1;--warning:#F59E0B;--warning-bg:#FEF4E2;--danger:#EF4444;--danger-bg:#FCEBEB;
   --c-sick:#EF4444;--c-personal:#6366F1;--c-other:#8B5CF6;--c-vacation:#10B981;--c-internal:#0EA5E9;--c-esv:#0891B2;--c-event:#EC4899;--c-overtime:#F97316;--c-offsite:#14B8A6;
   --r:18px;--r-sm:12px;--pill:50px;--font:'Prompt',sans-serif;--mono:'IBM Plex Mono',monospace;
@@ -64,12 +64,18 @@ input,select,textarea{font-family:inherit}
 
 /* ===== APP HEADER ===== */
 .appbar{background:linear-gradient(135deg,var(--navy-dark),var(--navy));color:#fff;padding:20px 20px 18px;flex-shrink:0;position:relative;overflow:hidden}
-.appbar .bg{position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,197,46,.13);filter:blur(40px);top:-90px;right:-50px}
+.appbar .bg{position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(61,107,176,.22);filter:blur(40px);top:-90px;right:-50px}
 .ab-top{display:flex;align-items:center;gap:12px;position:relative;z-index:2}
 .ab-ava{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--navy-soft),var(--navy-mid));display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;flex-shrink:0}
 .ab-hi{font-size:12.5px;color:rgba(255,255,255,.6)}.ab-name{font-size:16px;font-weight:700}
 .ab-bell{margin-left:auto;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;position:relative}
 .ab-bell svg{width:20px;height:20px}.ab-bell .d{position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--yellow);border:2px solid var(--navy)}
+.ab-conn{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap;flex-shrink:0;transition:.2s;line-height:1}
+.ab-conn .d{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ab-conn.on{background:rgba(34,197,94,.18);color:#86EFAC}.ab-conn.on .d{background:#34D399;box-shadow:0 0 0 3px rgba(52,211,153,.22)}
+.ab-conn.off{background:rgba(239,68,68,.2);color:#FCA5A5}.ab-conn.off .d{background:#F87171}
+.ab-conn.wait{background:rgba(245,179,1,.2);color:#FCD34D}.ab-conn.wait .d{background:#FBBF24;animation:pulse 1.4s infinite}
+.ab-conn svg{flex-shrink:0}.cp-spin{animation:spin .8s linear infinite;transform-origin:center}
 .ab-title{font-size:20px;font-weight:700;position:relative;z-index:2}
 .ab-sub{font-size:12.5px;color:rgba(255,255,255,.6);position:relative;z-index:2;margin-top:2px}
 
@@ -85,6 +91,14 @@ input,select,textarea{font-family:inherit}
 .db-bar.on{background:var(--success-bg);color:#0B7A55}.db-bar.on .dot{background:var(--success)}
 .db-bar.off{background:#FDECEC;color:#C0392B}.db-bar.off .dot{background:var(--danger)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+/* ===== connecting overlay (spinner popup) ===== */
+.conn-ov{position:absolute;inset:0;background:rgba(15,28,48,.28);z-index:80;display:none;align-items:center;justify-content:center}
+.conn-ov.open{display:flex;animation:fade .2s}
+.conn-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.65);border-radius:24px;padding:26px 30px;display:flex;flex-direction:column;align-items:center;gap:15px;box-shadow:0 16px 44px rgba(7,24,46,.22)}
+.spinner12{width:48px;height:48px;position:relative;animation:spin 1s steps(12) infinite}
+.spinner12 span{position:absolute;top:0;left:50%;width:4.5px;height:13px;margin-left:-2.25px;border-radius:3px;transform-origin:center 24px;transform:rotate(var(--r));background:var(--c)}
+.conn-card .txt{font-size:13px;font-weight:600;color:var(--navy)}
+@keyframes spin{to{transform:rotate(360deg)}}
 .qstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 12px;text-align:center;box-shadow:0 2px 8px rgba(10,35,66,.05)}
 .qstat b{font-family:var(--mono);font-size:24px;font-weight:600;display:block;line-height:1}
 .qstat span{font-size:11px;color:var(--ink-soft);margin-top:5px;display:block}
@@ -106,8 +120,6 @@ input,select,textarea{font-family:inherit}
 .rec-item .bar{width:4px;align-self:stretch;border-radius:3px;flex-shrink:0}
 .rec-b{flex:1;min-width:0}.rec-t{font-size:14px;font-weight:600;line-height:1.25}
 .rec-m{font-size:11.5px;color:var(--ink-soft);margin-top:3px}
-.rec-note{font-size:11.5px;color:var(--ink-mid);background:var(--canvas);border-radius:8px;padding:6px 9px;margin-top:6px;line-height:1.5;display:flex;align-items:flex-start;gap:6px}
-.rec-note svg{width:13px;height:13px;flex-shrink:0;margin-top:1px}
 .cat-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--pill);color:#fff;white-space:nowrap;display:inline-block}
 .st{font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--pill);white-space:nowrap}
 .st-pending{background:var(--warning-bg);color:#B47400}.st-approved{background:var(--success-bg);color:#0B7A55}
@@ -121,17 +133,74 @@ input,select,textarea{font-family:inherit}
 .cal-h button svg{width:16px;height:16px}
 .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal-dow{text-align:center;font-size:10px;color:var(--ink-soft);font-weight:600;padding:4px 0}
-.cal-c{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;position:relative;border:1px solid transparent}
-.cal-c.muted{color:var(--ink-soft);opacity:.4}.cal-c.today{background:var(--yellow-pale);border-color:var(--yellow-dark);color:var(--yellow-dark)}
-.cal-c.sel{border-color:var(--navy);background:#F4F8FD}.cal-c.we{color:var(--danger)}
-.cal-c.holi{background:#FDECEC;color:#C0392B}
-.holi-tip{display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:11px;background:#FDECEC;color:#C0392B;font-size:12.5px;font-weight:600;margin-bottom:12px}
+.cal-c{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;position:relative;border:1.5px solid transparent;color:var(--ink);transition:.12s}
+.cal-c.muted{color:transparent;pointer-events:none}
+.cal-c.today{background:var(--navy);color:#fff}
+.cal-c.sel{border-color:var(--navy)}
+.cal-c.pick{background:var(--navy);color:#fff;border-color:var(--navy)}
+.daychips{display:flex;flex-wrap:wrap;gap:6px}
+.daychip{background:#EEF1F5;color:var(--navy);font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px}
+/* week/month toggle + week timeline */
+.seg{display:flex;background:#E9EEF6;border-radius:20px;padding:3px}
+.seg span{font-size:12px;color:var(--ink-mid);padding:6px 14px;border-radius:17px;cursor:pointer;transition:.15s}
+.seg span.seg-on{background:var(--navy);color:#fff;font-weight:600}
+.wk-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.wk-strip>div{cursor:pointer}
+.wk-day{width:34px;height:34px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-family:var(--mono);color:var(--ink)}
+.wk-day.on{background:var(--navy);color:#fff}
+.wk-dot{width:5px;height:5px;border-radius:50%;display:inline-block}
+.allday-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.ad-chip{flex:1;min-width:135px;display:flex;align-items:center;gap:8px;border-radius:11px;padding:8px 10px;cursor:pointer}
+.ad-t{font-size:12px;font-weight:700;line-height:1.1}.ad-s{font-size:10.5px;color:var(--ink-mid)}
+.tl-wrap{position:relative;margin-left:44px;margin-top:6px}
+.tl-line{position:absolute;left:0;right:0;border-top:1px solid #EEF2F7}
+.tl-hr{position:absolute;left:-44px;font-size:10px;color:#A6B0BC;font-family:var(--mono)}
+.tl-lane{position:absolute;inset:0}
+.tl-block{position:absolute;border-radius:11px;padding:8px 10px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.tl-t{font-size:12.5px;font-weight:700;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-s{font-size:10.5px;color:var(--ink-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.tl-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;display:inline-block;margin-top:auto}
+.cal-c.we:not(.today){color:var(--ink-soft)}
+.cal-c.holi{background:#FCEBEB;color:#C0392B}
+.cal-c .cnt{position:absolute;top:2px;right:4px;font-size:9px;font-weight:700;font-family:var(--font)}
+.cal-legend{display:flex;flex-wrap:wrap;gap:8px 13px;padding:14px 4px 2px;font-size:10.5px;color:var(--ink-mid)}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.cal-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.holi-tip{display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:11px;background:#FCEBEB;color:#C0392B;font-size:12.5px;font-weight:600;margin-bottom:12px}
 .holi-tip svg{width:15px;height:15px;flex-shrink:0}
-.cal-c .dots{display:flex;gap:2px;position:absolute;bottom:5px}.cal-c .dot{width:5px;height:5px;border-radius:50%}
+/* avatars */
+.ava{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:600;overflow:hidden;flex-shrink:0;background:var(--navy);line-height:1}
+.ava img{width:100%;height:100%;object-fit:cover;display:block}
+.ava svg{width:55%;height:55%}
+.ava.ghost{background:#EEF1F5;color:var(--ink-soft)}
+.ava.more{background:#E7ECF4;color:var(--ink-mid);font-weight:700}
+.ava-stack{display:flex}.ava-stack>*{border:2px solid #fff;margin-left:-10px}.ava-stack>*:first-child{margin-left:0}
+/* tinted day cards */
+.tk-card{display:flex;align-items:center;gap:11px;padding:12px;border-radius:14px;margin-bottom:8px;cursor:pointer}
+.tk-b{flex:1;min-width:0}
+.tk-t{font-size:14px;font-weight:700;color:var(--ink);line-height:1.25}
+.tk-m{font-size:12px;color:var(--ink-mid);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* task rows + pill buttons */
+.grp-h{font-size:12px;color:var(--ink-soft);font-weight:600;margin:14px 2px 9px}
+.task-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:9px;box-shadow:0 2px 8px rgba(10,35,66,.04);cursor:pointer}
+.date-col{width:46px;text-align:center;flex-shrink:0;border-right:1px solid #EEF2F8;padding-right:10px;line-height:1.15}
+.date-col b{font-family:var(--mono);font-size:17px;font-weight:700;display:block}
+.date-col span{font-size:10px;color:var(--ink-soft);display:block}
+.task-b{flex:1;min-width:0}
+.task-sub{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-mid);margin-top:4px}
+.task-sub span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{border:none;border-radius:22px;padding:9px 15px;font-size:12.5px;font-weight:600;font-family:inherit;flex-shrink:0;cursor:pointer;transition:.12s;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-ghost{background:#fff;color:var(--navy);border:1px solid #C9D3E0}
+.btn-row{display:flex;gap:8px;margin-top:11px}.btn-row .btn{flex:1}
+.req-card{background:#E6F1FB;border-radius:14px;padding:13px;margin-bottom:9px}
+.req-flow{display:flex;align-items:center;gap:8px;margin:10px 0 3px}
+.flow-ar{color:var(--ink-soft);display:flex}.flow-ar svg{width:16px;height:16px}
 
 /* chips */
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
-.chip{padding:8px 14px;border-radius:var(--pill);background:#fff;border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink-mid);white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+.chip{padding:8px 14px;border-radius:var(--pill);background:#fff;border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink-mid);white-space:nowrap;flex-shrink:0}
 .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
 
 /* profile */
@@ -143,15 +212,16 @@ input,select,textarea{font-family:inherit}
 .prof-row .ic{width:38px;height:38px;border-radius:11px;background:var(--canvas);display:flex;align-items:center;justify-content:center;color:var(--navy);flex-shrink:0}
 .prof-row .ic svg{width:18px;height:18px}.prof-row .l{font-size:14px;font-weight:600}.prof-row .v{font-size:12px;color:var(--ink-soft)}
 .prof-row .ar{margin-left:auto;color:var(--ink-soft)}
-.logout{width:100%;margin-top:8px;padding:12px;border-radius:13px;background:var(--danger-bg);color:var(--danger);font-weight:600;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:7px}
+.logout{width:100%;margin-top:8px;padding:15px;border-radius:14px;background:var(--danger-bg);color:var(--danger);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.logout svg{width:19px;height:19px;flex-shrink:0}
 
 /* ===== BOTTOM NAV ===== */
 .tabbar{position:absolute;bottom:0;left:0;right:0;height:76px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;padding:0 8px 6px;z-index:20}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:10px;color:var(--ink-soft);font-size:10.5px;font-weight:600}
 .tab svg{width:23px;height:23px;stroke-width:2}
 .tab.on{color:var(--navy)}
-.fab{width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(21,57,110,.3);margin-top:-22px;flex-shrink:0}
-.fab svg{width:24px;height:24px;color:#fff;stroke-width:2.6}
+.fab{width:58px;height:58px;border-radius:20px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(21,57,110,.42);margin-top:-26px;flex-shrink:0}
+.fab svg{width:27px;height:27px;color:#fff;stroke-width:2.6}
 .fab:active{transform:scale(.94)}
 
 /* ===== SHEET (bottom modal) ===== */
@@ -191,9 +261,9 @@ input,select,textarea{font-family:inherit}
 .tg{width:46px;height:26px;border-radius:50px;background:#CBD5E6;position:relative;transition:.2s;flex-shrink:0}
 .tg::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 2px 5px rgba(0,0,0,.2)}
 .tg.on{background:var(--success)}.tg.on::after{left:23px}
-.submit{width:100%;margin-top:14px;padding:13px;border-radius:13px;background:linear-gradient(135deg,var(--yellow-bright),var(--yellow-dark));color:var(--navy-deep);font-size:14.5px;font-weight:700;box-shadow:0 5px 14px rgba(255,180,20,.28);display:flex;align-items:center;justify-content:center;gap:7px}
-.submit svg,.logout svg,.chip svg{width:17px;height:17px;flex-shrink:0}
+.submit{width:100%;margin-top:14px;padding:16px;border-radius:14px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));color:#fff;font-size:15.5px;font-weight:700;box-shadow:0 8px 20px rgba(21,57,110,.32);display:flex;align-items:center;justify-content:center;gap:8px}
 .submit:active{transform:scale(.99)}
+.submit svg{width:18px;height:18px;flex-shrink:0}
 
 .empty{text-align:center;padding:40px 20px;color:var(--ink-soft)}
 .empty svg{width:42px;height:42px;color:#C3CEE0;margin-bottom:12px}.empty h4{font-size:14px;color:var(--ink-mid);font-weight:600}.empty p{font-size:12.5px;margin-top:4px}
@@ -240,7 +310,7 @@ input,select,textarea{font-family:inherit}
 .pk-foot button{flex:1;padding:14px;border-radius:14px;font-weight:600;font-size:14px;font-family:inherit;line-height:1.25}
 .pk-foot .today-btn{background:var(--canvas);color:var(--navy)}
 .pk-foot .today-btn small,.pk-foot .ok-btn small{display:block;font-size:10px;font-weight:500;opacity:.7}
-.pk-foot .ok-btn{background:linear-gradient(180deg,var(--yellow-bright),var(--yellow-dark));color:var(--navy-deep)}
+.pk-foot .ok-btn{background:linear-gradient(180deg,var(--navy),var(--navy-mid));color:#fff}
 .tp-cols{display:flex;gap:12px;align-items:stretch}
 .tp-col{flex:1;text-align:center}
 .tp-col-h{font-size:11px;font-weight:700;color:var(--ink-soft);margin-bottom:8px}
@@ -277,7 +347,7 @@ input,select,textarea{font-family:inherit}
     <div class="glow y"></div><div class="glow b"></div>
     <div class="login-inner">
       <div class="lg-mark"><img src="https://raw.githubusercontent.com/add00917-hue/parkzone-assets/main/OPS-GNR3.png" alt="OPS-BSCS GNR3"></div>
-      <div class="lg-sub">Plans &amp; activities of the GNR3 team<br>แอปสมาชิก — บันทึกแผนงานและกิจกรรม</div>
+      <div class="lg-sub">ติดตามแผนงานและกิจกรรมทีม GNR3<br>Track GNR3 plans and activities</div>
       <div class="lg-form">
         <div class="lg-field"><label>ชื่อผู้ใช้งาน (Username)</label><input id="lg-user" placeholder="กรอกชื่อผู้ใช้งาน" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
         <div class="lg-field"><label>รหัสผ่าน (Password)</label><input id="lg-pass" type="password" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"></div>
@@ -296,7 +366,8 @@ input,select,textarea{font-family:inherit}
       <div class="bg"></div>
       <div class="ab-top">
         <div class="ab-ava" id="ab-ava">ธ</div>
-        <div><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ธนภัทร</div></div>
+        <div style="flex:1;min-width:0"><div class="ab-hi">สวัสดี 👋</div><div class="ab-name" id="ab-name">ธนภัทร</div></div>
+        <div class="ab-conn wait" id="ab-conn"><svg class="cp-spin" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg><span>Loading</span></div>
         <button class="ab-bell" onclick="toast('ยังไม่มีการแจ้งเตือนใหม่')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="d"></span></button>
       </div>
       <div style="margin-top:16px"><div class="ab-title" id="scr-title">หน้าแรก</div><div class="ab-sub" id="scr-sub">ภาพรวมของฉันวันนี้</div></div>
@@ -307,18 +378,20 @@ input,select,textarea{font-family:inherit}
       <div class="screen" id="s-cal"></div>
       <div class="screen" id="s-list"></div>
       <div class="screen" id="s-profile"></div>
+      <div class="screen" id="s-add"></div>
     </div>
 
     <nav class="tabbar">
       <button class="tab on" data-s="home" onclick="nav('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>หน้าแรก</button>
       <button class="tab" data-s="cal" onclick="nav('cal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>ปฏิทิน</button>
-      <button class="fab" onclick="openPicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="fab" onclick="nav('add')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       <button class="tab" data-s="list" onclick="nav('list')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>รายการ</button>
       <button class="tab" data-s="profile" onclick="nav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>โปรไฟล์</button>
     </nav>
   </div>
 
   <div class="sheet-bg" id="sheet-bg"><div class="sheet" id="sheet"></div></div>
+  <div class="conn-ov" id="conn-ov"><div class="spinner12"><span style="--r:0deg;--c:#12283F"></span><span style="--r:30deg;--c:#1B3557"></span><span style="--r:60deg;--c:#244472"></span><span style="--r:90deg;--c:#2C5BA0"></span><span style="--r:120deg;--c:#3B6FBF"></span><span style="--r:150deg;--c:#5A8AD0"></span><span style="--r:180deg;--c:#79A3DC"></span><span style="--r:210deg;--c:#98BAE6"></span><span style="--r:240deg;--c:#B3CCEE"></span><span style="--r:270deg;--c:#C9DBF3"></span><span style="--r:300deg;--c:#DCE8F8"></span><span style="--r:330deg;--c:#EAF1FC"></span></div></div>
   <div class="pk" id="pk"><div class="pk-card" id="pk-card"></div></div>
   <div class="savepop" id="savepop"><div class="savepop-card" id="savepop-card"></div></div>
   <div class="toast" id="toast"></div>
@@ -393,6 +466,19 @@ function pickProfilePhoto(){pickPhoto(function(d){_profPhoto=d;const el=document
 function pickPhoto(cb){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.onchange=function(){const f=inp.files[0];if(!f)return;const rd=new FileReader();rd.onload=function(){const img=new Image();img.onload=function(){const S=200,sc=Math.min(S/img.width,S/img.height,1),w=Math.round(img.width*sc),h=Math.round(img.height*sc);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function setAva(elId,e){const el=document.getElementById(elId);if(!el)return;el.style.background=avaColor(e.id);el.innerHTML=e.photo?`<img src="${e.photo}" style="width:100%;height:100%;object-fit:cover;display:block">`:initial(e.name||e.user||'?');}
 const initial=n=>String(n==null||n===''?'?':n).trim().charAt(0)||'?';
+/* avatar (photo first, colour-initial fallback, ghost icon when no person) */
+function avatarHTML(id,sz){sz=sz||34;const e=id?emp(id):null;
+  if(!e||e.name==='-'){return `<span class="ava ghost" style="width:${sz}px;height:${sz}px">${I.user}</span>`;}
+  const inner=e.photo?`<img src="${e.photo}" alt="">`:initial(e.name||e.nick||'?');
+  return `<span class="ava" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.42)}px;background:${e.photo?'#EEF1F5':avaColor(id)}">${inner}</span>`;}
+/* tinted activity card with person avatar */
+function dayCard(r){const c=CATX(r);
+  const sub=(r.emp?esc(dispName(r.emp)):'งานว่าง')+(r.st?' · '+r.st+(r.et?'-'+r.et:''):'')+(r.location?' · '+esc(r.location):'');
+  return `<div class="tk-card" style="background:${c.c}1F" onclick="openRec('${r.id}')">${avatarHTML(r.emp,38)}<div class="tk-b"><div class="tk-t">${c.th}${(r.cat==='task'&&r.title)?' · '+esc(r.title):''}</div><div class="tk-m">${sub}</div></div><span class="st st-${r.status}">${ST[r.status]||''}</span></div>`;}
+/* task row: left date column + person avatar + pill action */
+function taskRow(r,btn){const d=parse(r.start);
+  const sub=r.emp?avatarHTML(r.emp,22)+'<span>'+esc(dispName(r.emp))+(r.location?' · '+esc(r.location):'')+'</span>':'<span>'+(r.location?esc(r.location)+' · ':'')+'ยังไม่มีผู้รับผิดชอบ</span>';
+  return `<div class="task-row" onclick="openRec('${r.id}')"><div class="date-col"><b>${d.getDate()}</b><span>${THAI_MS[d.getMonth()]}</span><span>${r.st||'ทั้งวัน'}</span></div><div class="task-b"><div class="tk-t">${esc(r.title)}</div><div class="task-sub">${sub}</div></div>${btn}</div>`;}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 let rid=2400;
@@ -423,6 +509,7 @@ function enterAppUI(){
   document.getElementById('app').classList.remove('hidden');
   setAva('ab-ava',CUR);
   document.getElementById('ab-name').textContent=CUR.name?CUR.name.split(' ')[0]:CUR.user;
+  updateConnPill();
   nav('home');
 }
 async function doLogin(){
@@ -450,8 +537,10 @@ async function doLogin(){
 function logout(){closeSheet();document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');pingConn();}
 
 /* ===== NAV ===== */
-const SCR={home:['หน้าแรก','ภาพรวมของฉันวันนี้'],cal:['ปฏิทินทีม','กิจกรรมของทั้งทีม'],list:['รายการของฉัน','สถานะคำขอและบันทึก'],profile:['โปรไฟล์','ข้อมูลบัญชีของฉัน']};
+const SCR={home:['หน้าแรก','ภาพรวมของฉันวันนี้'],cal:['ปฏิทินทีม','กิจกรรมของทั้งทีม'],list:['รายการของฉัน','สถานะคำขอและบันทึก'],profile:['โปรไฟล์','ข้อมูลบัญชีของฉัน'],add:['เพิ่มรายการ','เลือกประเภทที่จะเพิ่ม']};
 let curScr='home', calY=NOW.getFullYear(), calM=NOW.getMonth(), selDate=TODAY, listF='all';
+let tcY=NOW.getFullYear(), tcM=NOW.getMonth(), tcMulti=false, tcSel=[];
+let calView='month';
 function nav(s){curScr=s;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===s));
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
@@ -459,7 +548,7 @@ function nav(s){curScr=s;
   document.getElementById('scr-title').textContent=SCR[s][0];
   document.getElementById('scr-sub').textContent=SCR[s][1];
   try{
-    if(s==='home')renderHome();if(s==='cal')renderCal();if(s==='list')renderList();if(s==='profile')renderProfile();
+    if(s==='home')renderHome();if(s==='cal')renderCal();if(s==='list')renderList();if(s==='profile')renderProfile();if(s==='add')renderAdd();
   }catch(err){ // ห้ามปล่อยจอขาว — แสดงข้อผิดพลาดและปุ่มลองใหม่
     const el=document.getElementById('s-'+s);
     if(el)el.innerHTML=`<div class="card" style="padding:22px;text-align:center"><div style="font-weight:700;margin-bottom:6px">แสดงข้อมูลไม่สำเร็จ</div><div style="font-size:12.5px;color:var(--ink-soft);margin-bottom:14px">${esc(err.message||'เกิดข้อผิดพลาด')}</div><button class="lg-btn" style="width:auto;padding:12px 22px" onclick="syncDBm()">โหลดข้อมูลใหม่</button></div>`;
@@ -468,6 +557,8 @@ function nav(s){curScr=s;
 }
 const myRecs=()=>records.filter(r=>r.emp===CUR.id);
 const recOn=ds=>records.filter(r=>r.start<=ds&&ds<=r.end);
+let calScope='team';
+const calRecOn=ds=>{const rs=calScope==='me'?records.filter(r=>r.emp===CUR.id):records;return rs.filter(r=>r.start<=ds&&ds<=r.end);};
 
 /* ---- database connection ---- */
 let DBS='connecting';
@@ -486,8 +577,15 @@ async function pingConn(){
   }catch(e){setC('off','เชื่อมต่อฐานข้อมูลไม่ได้ • ออฟไลน์');}
 }
 document.addEventListener('DOMContentLoaded',pingConn);
-function dbBar(){const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • เชื่อมต่อฐานข้อมูลไม่ได้']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
-function setDBm(st){DBS=st;if(curScr==='home')renderHome();}
+function dbBar(){if(DBS==='connecting')return '';const m={connecting:['wait','กำลังเชื่อมต่อฐานข้อมูล...'],online:['on','ฐานข้อมูลเชื่อมต่อแล้ว'],offline:['off','ออฟไลน์ • เชื่อมต่อฐานข้อมูลไม่ได้']};const x=m[DBS];return `<div class="db-bar ${x[0]}"><span class="dot"></span>${x[1]}</div>`;}
+function showConn(on){const el=document.getElementById('conn-ov');if(el)el.classList.toggle('open',!!on);}
+function updateConnPill(){const el=document.getElementById('ab-conn');if(!el)return;
+  const chk='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const xx='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  const spin='<svg class="cp-spin" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9"/></svg>';
+  const m={connecting:['wait',spin,'Loading'],online:['on',chk,'Connected'],offline:['off',xx,'Error']};
+  const s=m[DBS]||m.connecting;el.className='ab-conn '+s[0];el.innerHTML=`${s[1]}<span>${s[2]}</span>`;}
+function setDBm(st){DBS=st;showConn(st==='connecting');updateConnPill();if(curScr==='home')renderHome();}
 async function syncDBm(){
   if(!CONFIG.SHEETS_API_URL){setDBm('offline');return;}
   setDBm('connecting');
@@ -518,13 +616,11 @@ function renderHome(){
   const todayMine=mine.filter(r=>r.start<=TODAY&&TODAY<=r.end).length;
   const upcoming=mine.filter(r=>r.end>=TODAY).sort((a,b)=>a.start<b.start?-1:1).slice(0,4);
   document.getElementById('s-home').innerHTML=`
-  ${dbBar()}
   <div class="qstats">
     <div class="qstat"><b class="mono">${mine.length}</b><span>รายการ</span></div>
     <div class="qstat a"><b class="mono">${pend}</b><span>รออนุมัติ</span></div>
     <div class="qstat g"><b class="mono">${todayMine}</b><span>วันนี้</span></div>
   </div>
-  ${taskHomeSection()}
   <div class="sec-h"><h3>แจ้งรายการใหม่</h3></div>
   <div class="qa-grid">
     ${qa('leave','#15396E',I.cal,'แจ้งลา','ป่วย/กิจ/อื่นๆ/พักร้อน')}
@@ -545,27 +641,18 @@ function taskHomeSection(){
   const open=ts.filter(r=>r.status==='open'||!r.emp).sort((a,b)=>a.start<b.start?-1:1);
   const reqs=canApproveM()?ts.filter(r=>r.pendingEmp):[];
   const mine=ts.filter(r=>r.emp===CUR.id&&r.status!=='open').sort((a,b)=>a.start<b.start?-1:1).slice(0,3);
-  let html=`<div class="sec-h"><h3>งานมอบหมาย (Task)</h3>${canApproveM()?`<a onclick="openTaskFormM()">+ เปิดงานใหม่</a>`:''}</div>`;
-  // ช่องแจ้งงาน: คำขอเปลี่ยนผู้รับผิดชอบ (ผู้อนุมัติ/ผู้ดูแล)
-  if(reqs.length)html+=`<div class="card" style="border:1px solid #3B82F644;background:#EFF6FF;margin-bottom:12px"><div style="padding:12px 14px 6px;font-weight:700;font-size:13px;color:#1D4ED8">🔄 คำขอเปลี่ยนผู้รับผิดชอบ (${reqs.length})</div>${reqs.map(r=>`
-    <div class="rec-item"><div class="bar" style="background:#3B82F6"></div><div class="rec-b" style="flex:1">
-      <div class="rec-t">${esc(r.title)}</div>
-      <div class="rec-m">${esc(dispName(r.emp))} → <b>${esc(dispName(r.reqBy))}</b> ขอรับผิดชอบ</div>
-      <div style="display:flex;gap:8px;margin-top:8px"><button class="chip" style="background:var(--success-bg);color:#0B7A55" onclick="decideReassignM('${r.id}','approved')">✓ อนุมัติ</button><button class="chip" onclick="decideReassignM('${r.id}','rejected')">✕ ปฏิเสธ</button></div>
-    </div></div>`).join('')}</div>`;
+  let html=`<div class="sec-h"><h3>งานมอบหมาย</h3>${canApproveM()?`<a onclick="openTaskCal()">+ เปิดงานใหม่</a>`:''}</div>`;
+  // คำขอเปลี่ยนผู้รับผิดชอบ (ผู้อนุมัติ/ผู้ดูแล) — แสดงเป็น avatar → avatar
+  if(reqs.length)html+=`<div class="grp-h">คำขอเปลี่ยนผู้รับผิดชอบ · ${reqs.length}</div>`+reqs.map(r=>`
+    <div class="req-card">
+      <div class="tk-t" style="color:#0C447C">${esc(r.title)}</div>
+      <div class="req-flow">${avatarHTML(r.emp,26)}<span class="flow-ar">${I.ar}</span>${avatarHTML(r.reqBy,26)}<span style="font-size:12px;color:#185FA5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(dispName(r.reqBy))} ขอรับผิดชอบแทน</span></div>
+      <div class="btn-row"><button class="btn btn-primary" onclick="decideReassignM('${r.id}','approved')">อนุมัติ</button><button class="btn btn-ghost" onclick="decideReassignM('${r.id}','rejected')">ปฏิเสธ</button></div>
+    </div>`).join('');
   // งานว่าง กดรับได้
-  if(open.length)html+=`<div class="card" style="border:1px solid #F59E0B44;background:#FFFBEB;margin-bottom:12px"><div style="padding:12px 14px 6px;font-weight:700;font-size:13px;color:#B45309">📋 งานว่าง — กดรับได้ (${open.length})</div>${open.slice(0,4).map(r=>`
-    <div class="rec-item"><div class="bar" style="background:#F59E0B"></div><div class="rec-b" style="flex:1">
-      <div class="rec-t">${esc(r.title)}</div>
-      <div class="rec-m">${r.location?esc(r.location)+' • ':''}${fmtTH(r.start)}${r.st?' • '+r.st+(r.et?'-'+r.et:''):''}</div>
-      <div class="rec-m" style="color:#B45309;font-weight:600">ยังไม่มีผู้รับผิดชอบ</div>
-      ${r.note?`<div class="rec-note">${I.inbox} ${esc(r.note)}</div>`:''}
-      <button class="chip" style="background:var(--navy);color:#fff;margin-top:8px" onclick="claimTaskM('${r.id}')">${I.check} กดรับงานนี้</button>
-    </div></div>`).join('')}</div>`;
+  if(open.length)html+=`<div class="grp-h">งานว่าง — กดรับได้ · ${open.length}</div>`+open.slice(0,5).map(r=>taskRow(r,`<button class="btn btn-primary" onclick="event.stopPropagation();claimTaskM('${r.id}')">กดรับงาน</button>`)).join('');
   // งานของฉัน
-  if(mine.length)html+=`<div class="card">${mine.map(r=>`<div class="rec-item" onclick="openRec('${r.id}')"><div class="bar" style="background:#7C3AED"></div>
-    <div class="rec-b" style="flex:1"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${r.location?esc(r.location)+' • ':''}${fmtTH(r.start)}${r.st?' • '+r.st+(r.et?'-'+r.et:''):''}</div><div class="rec-m">ผู้รับผิดชอบ: <b>${esc(dispName(r.emp))}</b></div>${r.note?`<div class="rec-note">${I.inbox} ${esc(r.note)}</div>`:''}</div>
-    <span class="cat-pill" style="background:#7C3AED">งานของฉัน</span></div>`).join('')}</div>`;
+  if(mine.length)html+=`<div class="grp-h">ของฉัน</div>`+mine.map(r=>taskRow(r,`<button class="btn btn-ghost" onclick="event.stopPropagation();openRec('${r.id}')">จัดการ</button>`)).join('');
   if(!open.length&&!reqs.length&&!mine.length)html+=`<div class="card"><div class="empty" style="padding:20px">${I.check}<h4>ไม่มีงานมอบหมาย</h4></div></div>`;
   return html;
 }
@@ -615,32 +702,177 @@ function recRow(r){return `<div class="rec-item"><div class="bar" style="backgro
   <span class="st st-${r.status}">${ST[r.status]}</span></div>`;}
 function emptyHTML(t){return `<div class="empty">${I.inbox}<h4>${t}</h4><p>กดปุ่ม + เพื่อเพิ่มรายการ</p></div>`;}
 
+/* ===== เพิ่มงาน · ปฏิทิน (Task add calendar) ===== */
+function openTaskCal(){tcY=NOW.getFullYear();tcM=NOW.getMonth();tcMulti=false;tcSel=[];openSheet('เพิ่มงาน · ปฏิทิน',`<div id="tc-wrap"></div>`);renderTaskCal();}
+function tcStep(dir){tcM+=dir;if(tcM<0){tcM=11;tcY--;}if(tcM>11){tcM=0;tcY++;}renderTaskCal();}
+function tcToggleMulti(){tcMulti=!tcMulti;tcSel=[];renderTaskCal();}
+function tcTapDay(ds){if(tcMulti){const i=tcSel.indexOf(ds);if(i>=0)tcSel.splice(i,1);else tcSel.push(ds);renderTaskCal();}else{openTaskForm([ds]);}}
+function tcAddSelected(){if(!tcSel.length){toast('ยังไม่ได้เลือกวัน','err');return;}openTaskForm(tcSel.slice().sort());}
+function renderTaskCal(){
+  const wrap=document.getElementById('tc-wrap');if(!wrap)return;
+  const dim=daysIn(tcY,tcM),first=new Date(tcY,tcM,1).getDay();
+  let cells=DOW_TH.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for(let i=0;i<first;i++)cells+=`<div class="cal-c muted"></div>`;
+  for(let d=1;d<=dim;d++){const ds=tcY+'-'+pad(tcM+1)+'-'+pad(d);
+    const tks=records.filter(r=>r.cat==='task'&&r.start<=ds&&ds<=r.end);
+    const dow=new Date(tcY,tcM,d).getDay(),hol=holiName(ds),isToday=ds===TODAY,picked=tcSel.indexOf(ds)>=0;
+    const cls=['cal-c'];if(picked)cls.push('pick');else if(isToday)cls.push('today');if((dow===0||dow===6)&&!picked)cls.push('we');if(hol&&!picked&&!isToday)cls.push('holi');
+    let style='',badge='';
+    if(tks.length&&!picked){if(!isToday&&!hol)style=` style="background:#7C3AED1F"`;badge=`<span class="cnt" style="color:${isToday?'#fff':'#7C3AED'}">${tks.length}</span>`;}
+    cells+=`<div class="${cls.join(' ')}"${style} onclick="tcTapDay('${ds}')">${d}${badge}</div>`;}
+  wrap.innerHTML=`
+    <button class="submit" style="margin-top:0" onclick="openTaskForm(null)">${I.check} เพิ่มงาน (เลือกช่วงวันเอง)</button>
+    <div class="toggle-row" style="margin-top:14px"><div><div class="l">เลือกหลายวัน</div><div class="s">แตะเลือกได้มากกว่า 1 วัน</div></div><div class="tg ${tcMulti?'on':''}" onclick="tcToggleMulti()"></div></div>
+    <div class="card cal-card" style="margin-top:12px">
+      <div class="cal-h"><div class="t">${THAI_M[tcM]} ${be(tcY)}<div class="en">${EN_M[tcM]} ${tcY}</div></div><div style="display:flex;gap:8px"><button onclick="tcStep(-1)">${I.chevL}</button><button onclick="tcStep(1)">${I.chevR}</button></div></div>
+      <div class="cal-g">${cells}</div>
+      <div class="cal-legend"><span><i style="background:#7C3AED"></i>งานที่มีอยู่</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--ink-soft);text-align:center;margin-top:12px">${tcMulti?(tcSel.length?`เลือกแล้ว ${tcSel.length} วัน`:'แตะวันเพื่อเลือก (เลือกได้หลายวัน)'):'แตะวันเพื่อเพิ่มงานในวันนั้น'}</div>
+    ${tcMulti&&tcSel.length?`<button class="submit" onclick="tcAddSelected()">${I.check} เพิ่มงานใน ${tcSel.length} วันที่เลือก</button>`:''}`;
+}
+function openTaskForm(dates){
+  const multi=Array.isArray(dates);
+  const dayBlock=multi
+    ?`<div class="field"><label>วันที่เลือก (${dates.length} วัน)</label><div class="daychips">${dates.slice().sort().map(ds=>`<span class="daychip">${+ds.slice(8,10)} ${THAI_MS[(+ds.slice(5,7))-1]}</span>`).join('')}</div></div>`
+    :`<div class="row2"><div class="field"><label>วันที่เริ่ม</label>${dateField('tf-start',TODAY)}</div><div class="field"><label>ถึงวันที่</label>${dateField('tf-end',TODAY)}</div></div>`;
+  const datesArg=multi?JSON.stringify(dates).replace(/"/g,"'"):'null';
+  openSheet(multi?`เพิ่มงาน · ${dates.length} วัน`:'เพิ่มงาน',`
+    <div class="field"><label>อาคาร</label><select id="tf-build" onchange="tfBuildToggle()">${BUILDINGS.map(b=>`<option value="${b}">${b}</option>`).join('')}</select></div>
+    <div class="field hidden" id="tf-build-c"><label>ระบุอาคาร</label><input id="tf-build-o" placeholder="ชื่ออาคาร/สถานที่"></div>
+    <div class="field"><label>ประเภทงาน</label><select id="tf-type" onchange="tfTypeToggle()">${TASKS.map((t,i)=>`<option value="${i}">${t.th} / ${t.en}</option>`).join('')}</select></div>
+    <div class="field hidden" id="tf-type-c"><label>ระบุประเภทงาน</label><input id="tf-type-o" placeholder="ระบุงาน"></div>
+    <div class="field"><label>ผู้รับผิดชอบ</label><select id="tf-emp"><option value="">— เปิดงานไว้ (ให้กดรับเอง) —</option>${employees.filter(e=>!isInactive(e)).map(e=>`<option value="${e.id}">${esc(e.nick?e.nick+' ('+e.name+')':e.name)}</option>`).join('')}</select></div>
+    ${dayBlock}
+    <div class="field"><label>รายละเอียด</label><textarea id="tf-note" placeholder="หมายเหตุ"></textarea></div>
+    <button class="submit" onclick="submitTaskForm(${datesArg})">${I.check} ${multi?'เพิ่มงาน '+dates.length+' วัน':'บันทึกงาน'}</button>`,true);
+}
+function tfBuildToggle(){const c=document.getElementById('tf-build-c');if(c)c.classList.toggle('hidden',fv('tf-build')!=='อื่นๆ');}
+function tfTypeToggle(){const c=document.getElementById('tf-type-c');if(c)c.classList.toggle('hidden',TASKS[+fv('tf-type')].th!=='อื่นๆ');}
+function submitTaskForm(dates){
+  let build=fv('tf-build');if(build==='อื่นๆ')build=(fv('tf-build-o')||'').trim()||'อื่นๆ';
+  const ti=+fv('tf-type');const title=TASKS[ti].th==='อื่นๆ'?((fv('tf-type-o')||'').trim()||'อื่นๆ'):(TASKS[ti].th+' / '+TASKS[ti].en);
+  const empId=fv('tf-emp'),note=fv('tf-note');
+  if(!Array.isArray(dates)){const s=fv('tf-start'),e=fv('tf-end');if(!s){toast('กรุณาเลือกวันที่','err');return;}
+    saveRecordM({action:'createRecord',emp_id:empId,category:'task',title,location:build,start_date:s,end_date:e||s,note,actor:CUR.id},
+      R(empId,'task',s,e||s,{title,location:build,note,status:empId?'none':'open'}));return;}
+  const days=[...new Set(dates)].sort();
+  if(!days.length){toast('ยังไม่ได้เลือกวัน','err');return;}
+  const items=days.map(ds=>({payload:{action:'createRecord',emp_id:empId,category:'task',title,location:build,start_date:ds,end_date:ds,note,actor:CUR.id},
+    local:R(empId,'task',ds,ds,{title,location:build,note,status:empId?'none':'open'})}));
+  saveManyRecordsM(items);
+}
+async function saveManyRecordsM(items){
+  items.forEach(it=>records.unshift(it.local));closeSheet();nav(curScr);
+  if(!CONFIG.SHEETS_API_URL){toast('บันทึกแล้ว '+items.length+' วัน');return;}
+  showSavingM();let ok=0,fail=0,lastErr='';
+  for(const it of items){
+    try{const res=await fetch(CONFIG.SHEETS_API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(it.payload)});
+      const j=await res.json();
+      if(j&&j.ok){ok++;const dd=j.data||{};if(dd.record_id)it.local.id=String(dd.record_id);if(dd.status)it.local.status=String(dd.status).toLowerCase();}
+      else{fail++;lastErr=(j&&/category/i.test(j.error||''))?'ต้อง deploy โค้ด Apps Script ใหม่ก่อน':((j&&j.error)||'ฐานข้อมูลไม่ตอบสนอง');}
+    }catch(e){fail++;lastErr='เชื่อมต่อฐานข้อมูลไม่ได้';}
+  }
+  nav(curScr);
+  if(fail===0)showSavedM(true);else showSavedM(false,`สำเร็จ ${ok}/${items.length} วัน • ${lastErr}`);
+}
+
 /* ===== CALENDAR ===== */
-function renderCal(){
+function monthFragment(){
   const dim=daysIn(calY,calM), first=new Date(calY,calM,1).getDay();
   let cells=DOW_TH.map(d=>`<div class="cal-dow">${d}</div>`).join('');
   for(let i=0;i<first;i++)cells+=`<div class="cal-c muted"></div>`;
-  for(let d=1;d<=dim;d++){const ds=calY+'-'+pad(calM+1)+'-'+pad(d);const recs=recOn(ds);const dow=new Date(calY,calM,d).getDay();const hol=holiName(ds);
-    const cls=['cal-c'];if(ds===TODAY)cls.push('today');if(ds===selDate)cls.push('sel');if(dow===0||dow===6)cls.push('we');if(hol)cls.push('holi');
-    let dots=(hol?'<span class="dot" style="background:#C0392B"></span>':'')+recs.slice(0,3).map(r=>`<span class="dot" style="background:${CATX(r).c}"></span>`).join('');
-    cells+=`<div class="${cls.join(' ')}" onclick="selDate='${ds}';renderCal();openDay('${ds}')">${d}<div class="dots">${dots}</div></div>`;}
-  const recs=recOn(selDate);
-  document.getElementById('s-cal').innerHTML=`
+  for(let d=1;d<=dim;d++){const ds=calY+'-'+pad(calM+1)+'-'+pad(d);const recs=calRecOn(ds);const dow=new Date(calY,calM,d).getDay();const hol=holiName(ds);
+    const isToday=ds===TODAY,isSel=ds===selDate;
+    const cls=['cal-c'];if(isToday)cls.push('today');if(isSel)cls.push('sel');if(dow===0||dow===6)cls.push('we');if(hol&&!isToday)cls.push('holi');
+    let style='',badge='';
+    if(recs.length){const col=CATX(recs[0]).c;if(!isToday&&!hol)style=` style="background:${col}22"`;badge=`<span class="cnt" style="color:${isToday?'#fff':col}">${recs.length}</span>`;}
+    cells+=`<div class="${cls.join(' ')}"${style} onclick="selDate='${ds}';paintCal()">${d}${badge}</div>`;}
+  const recs=calRecOn(selDate);
+  const away=calScope==='team'?recs.filter(r=>CATX(r).g==='leave'||r.cat==='offsite'||r.cat==='event'):[];
+  const awayCard=away.length?`
+  <div class="sec-h"><h3>ใครไม่อยู่${selDate===TODAY?'วันนี้':''} · ${away.length}</h3></div>
+  <div class="card" style="padding:13px;display:flex;align-items:center;gap:12px">
+    <div class="ava-stack">${away.slice(0,4).map(r=>avatarHTML(r.emp,36)).join('')}${away.length>4?`<span class="ava more" style="width:36px;height:36px;font-size:12px">+${away.length-4}</span>`:''}</div>
+    <div style="font-size:12.5px;color:var(--ink-mid);line-height:1.45;flex:1;min-width:0">${away.slice(0,3).map(r=>esc(dispName(r.emp))+' '+CATX(r).th).join(' · ')}${away.length>3?` และอีก ${away.length-3} คน`:''}</div>
+  </div>`:'';
+  return `
   <div class="card cal-card">
     <div class="cal-h"><div class="t">${THAI_M[calM]} ${be(calY)}<div class="en">${EN_M[calM]} ${calY}</div></div>
       <div style="display:flex;gap:8px"><button onclick="calStep(-1)">${I.chevL}</button><button onclick="calStep(1)">${I.chevR}</button></div></div>
     <div class="cal-g">${cells}</div>
+    <div class="cal-legend"><span><i style="background:#DC2626"></i>ลา</span><span><i style="background:#16A34A"></i>พักร้อน</span><span><i style="background:#EA580C"></i>OT</span><span><i style="background:#7C3AED"></i>งาน</span><span><i style="background:#C0392B"></i>วันหยุด</span></div>
   </div>
-  <div class="sec-h"><h3>${selDate===TODAY?'วันนี้':fmtTH(selDate)}</h3><a onclick="openDay('${selDate}')">รายละเอียด</a></div>
+  ${awayCard}
+  <div class="sec-h"><h3>${selDate===TODAY?'วันนี้':fmtTH(selDate)}</h3></div>
   ${holiName(selDate)?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(holiName(selDate))}</div>`:''}
-  <div class="card">${recs.length?recs.map(recRow).join(''):emptyHTML('ไม่มีกิจกรรมในวันนี้')}</div>`;
+  <div>${recs.length?recs.map(dayCard).join(''):`<div class="card">${emptyHTML('ไม่มีกิจกรรมในวันนี้')}</div>`}</div>`;
 }
-function calStep(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}renderCal();}
+function renderCal(){document.getElementById('s-cal').innerHTML=calFragment();}
+function addPickers(){return `
+  <div class="sec-h"><h3>แจ้งรายการใหม่</h3></div>
+  ${pick('leave','#15396E',I.cal,'แจ้งลา','ป่วย / กิจ / อื่นๆ / พักร้อน')}
+  ${pick('training','#0EA5E9',I.cap,'อบรม / กิจกรรม','อบรมภายใน / ESV / กิจกรรม')}
+  ${pick('overtime','#F97316',I.bolt,'ทำงานล่วงเวลา (OT)','บันทึก OT')}
+  ${pick('offsite','#14B8A6',I.pin,'งานนอกสถานที่','ค้างคืน / ค่าใช้จ่าย')}
+  ${pick('task','#7C3AED',I.check,'มอบหมายงาน','Task Assignment • ไม่ต้องอนุมัติ','openTaskCal()')}
+  <div class="sec-h" style="margin-top:20px"><h3>ปฏิทินทีม</h3></div>`;}
+function renderAdd(){document.getElementById('s-add').innerHTML=addPickers()+calFragment();}
+function paintCal(){curScr==='add'?renderAdd():renderCal();}
+function calFragment(){return calToggleRow()+(calView==='week'?weekFragment():monthFragment())+((curScr==='cal'&&calScope==='team')?taskHomeSection():'');}
+function calToggleRow(){return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+  <div class="seg"><span class="${calScope==='me'?'seg-on':''}" onclick="setCalScope('me')">ส่วนตัว</span><span class="${calScope==='team'?'seg-on':''}" onclick="setCalScope('team')">ทีม</span></div>
+  <div class="seg"><span class="${calView==='week'?'seg-on':''}" onclick="setCalView('week')">สัปดาห์</span><span class="${calView==='month'?'seg-on':''}" onclick="setCalView('month')">เดือน</span></div>
+</div>`;}
+function setCalView(v){calView=v;paintCal();}
+function setCalScope(v){calScope=v;paintCal();}
+const toMin=t=>{const p=String(t||'0:0').split(':');return (+p[0]||0)*60+(+p[1]||0);};
+function weekDays(ds){const d=parse(ds);const sun=new Date(d);sun.setDate(d.getDate()-d.getDay());const out=[];for(let i=0;i<7;i++){const x=new Date(sun);x.setDate(sun.getDate()+i);out.push(x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()));}return out;}
+function weekLabel(wk){const a=parse(wk[0]),b=parse(wk[6]);return a.getMonth()===b.getMonth()?`${a.getDate()}–${b.getDate()} ${THAI_MS[b.getMonth()]} ${be(b.getFullYear())}`:`${a.getDate()} ${THAI_MS[a.getMonth()]} – ${b.getDate()} ${THAI_MS[b.getMonth()]} ${be(b.getFullYear())}`;}
+function weekStep(dir){const d=parse(selDate);d.setDate(d.getDate()+dir*7);selDate=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());calY=d.getFullYear();calM=d.getMonth();paintCal();}
+function packCols(items){
+  const res=items.map(()=>({col:0,cols:1}));
+  const iv=items.map((r,i)=>({i,s:toMin(r.st),e:Math.max(toMin(r.st)+30,r.et&&toMin(r.et)>toMin(r.st)?toMin(r.et):toMin(r.st)+60)}));
+  const order=[...iv].sort((a,b)=>a.s-b.s||a.e-b.e);
+  let cluster=[],colEnds=[],cMax=-1;
+  function flush(){const cols=colEnds.length||1;cluster.forEach(x=>{res[x.i].col=x.col;res[x.i].cols=cols;});cluster=[];colEnds=[];cMax=-1;}
+  order.forEach(it=>{if(cluster.length&&it.s>=cMax)flush();let col=colEnds.findIndex(e=>e<=it.s);if(col===-1){col=colEnds.length;colEnds.push(it.e);}else colEnds[col]=it.e;it.col=col;cluster.push(it);cMax=Math.max(cMax,it.e);});
+  flush();return res;
+}
+function timelineHTML(items){
+  if(!items.length)return `<div class="card">${emptyHTML('ไม่มีงานที่มีช่วงเวลาในวันนี้')}</div>`;
+  const HP=46;let minH=8,maxH=18;
+  items.forEach(r=>{const s=toMin(r.st),e=(r.et&&toMin(r.et)>toMin(r.st))?toMin(r.et):s+60;minH=Math.min(minH,Math.floor(s/60));maxH=Math.max(maxH,Math.ceil(e/60));});
+  minH=Math.max(0,minH);maxH=Math.min(24,Math.max(maxH,minH+2));
+  const lay=packCols(items),H=(maxH-minH)*HP;
+  let grid='';for(let h=minH;h<=maxH;h++){const top=(h-minH)*HP;grid+=`<div class="tl-line" style="top:${top}px"></div><div class="tl-hr" style="top:${top-6}px">${pad(h)}:00</div>`;}
+  let blocks='';
+  items.forEach((r,i)=>{const s=toMin(r.st),e0=(r.et&&toMin(r.et)>toMin(r.st))?toMin(r.et):s+60;const top=(s/60-minH)*HP,ht=Math.max(40,(e0-s)/60*HP-6);const c=CATX(r),L=lay[i],w=100/L.cols,left=L.col*w;
+    blocks+=`<div class="tl-block" style="top:${top}px;height:${ht}px;left:calc(${left}% + 4px);width:calc(${w}% - 8px);background:${c.c}1F" onclick="openRec('${r.id}')">
+      <div style="min-width:0"><div class="tl-t" style="color:${c.c}">${c.th}${r.cat==='task'&&r.title?' · '+esc(r.title):''}</div><div class="tl-s">${r.emp?esc(dispName(r.emp)):'งานว่าง'}${r.location?' · '+esc(r.location):''}</div></div>
+      <span class="tl-pill" style="color:${c.c};background:${c.c}30">${r.st}${r.et?'–'+r.et:''}</span>
+    </div>`;});
+  return `<div class="tl-wrap" style="height:${H}px">${grid}<div class="tl-lane">${blocks}</div></div>`;
+}
+function weekFragment(){
+  const wk=weekDays(selDate),dayRecs=calRecOn(selDate);
+  const allday=dayRecs.filter(r=>!r.st),timed=dayRecs.filter(r=>r.st).sort((a,b)=>toMin(a.st)-toMin(b.st));
+  const strip=DOW_TH.map((d,i)=>{const ds=wk[i],rc=calRecOn(ds),sel=ds===selDate,dd=+ds.slice(8,10);
+    return `<div onclick="selDate='${ds}';paintCal()"><div style="font-size:10px;color:var(--ink-soft);margin-bottom:5px">${d}</div><div class="wk-day${sel?' on':''}">${dd}</div><div style="height:6px;margin-top:3px">${rc.length&&!sel?`<span class="wk-dot" style="background:${CATX(rc[0]).c}"></span>`:''}</div></div>`;}).join('');
+  const alldayHTML=allday.length?`<div class="grp-h" style="margin-top:2px">ทั้งวัน</div><div class="allday-row">${allday.map(r=>{const c=CATX(r);return `<div class="ad-chip" style="background:${c.c}1F" onclick="openRec('${r.id}')">${avatarHTML(r.emp,22)}<div style="min-width:0"><div class="ad-t" style="color:${c.c}">${c.th}</div><div class="ad-s">${r.emp?esc(dispName(r.emp)):'งานว่าง'}</div></div></div>`;}).join('')}</div>`:'';
+  return `
+  <div class="card cal-card" style="padding:14px 12px">
+    <div class="cal-h" style="margin-bottom:12px"><div class="t">${weekLabel(wk)}</div><div style="display:flex;gap:8px"><button onclick="weekStep(-1)">${I.chevL}</button><button onclick="weekStep(1)">${I.chevR}</button></div></div>
+    <div class="wk-strip">${strip}</div>
+  </div>
+  ${alldayHTML}
+  <div class="sec-h"><h3>${selDate===TODAY?'วันนี้':fmtTH(selDate)}</h3></div>
+  ${timelineHTML(timed)}`;
+}
+function calStep(d){calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}paintCal();}
 function openDay(ds){const recs=recOn(ds);const d=parse(ds);const hol=holiName(ds);
   openSheet(`${d.getDate()} ${THAI_M[d.getMonth()]} ${be(d.getFullYear())}`,
-    `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(r=>{const e=emp(r.emp);return `<div class="rec-item" style="border:1px solid var(--line);border-radius:14px"><div class="bar" style="background:${CATX(r).c}"></div>
-      <div class="rec-b"><div class="rec-t">${esc(r.title)}</div><div class="rec-m">${r.emp?esc(dispName(r.emp)):'งานว่าง'} • ${r.st?r.st+(r.et?'-'+r.et:'')+' • ':''}${r.location?esc(r.location):'—'}</div></div>
-      <span class="cat-pill" style="background:${CATX(r).c}">${CATX(r).th}</span></div>`;}).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`,true);
+    `${hol?`<div class="holi-tip">${I.cal} วันหยุดบริษัท: ${esc(hol)}</div>`:''}<div class="day-sheet-list">${recs.length?recs.map(dayCard).join(''):emptyHTML('ไม่มีกิจกรรม')}</div>`,true);
 }
 
 /* ===== MY LIST ===== */
@@ -813,9 +1045,9 @@ function openPicker(){
     ${pick('training','#0EA5E9',I.cap,'อบรม / กิจกรรม','อบรมภายใน / ESV / กิจกรรม')}
     ${pick('overtime','#F97316',I.bolt,'ทำงานล่วงเวลา (OT)','บันทึก OT')}
     ${pick('offsite','#14B8A6',I.pin,'งานนอกสถานที่','ค้างคืน / ค่าใช้จ่าย')}
-    ${pick('task','#7C3AED',I.check,'มอบหมายงาน','Task Assignment • ไม่ต้องอนุมัติ')}`);
+    ${pick('task','#7C3AED',I.check,'มอบหมายงาน','Task Assignment • ไม่ต้องอนุมัติ','openTaskCal()')}`);
 }
-function pick(type,c,icon,t,s){return `<button class="pick" style="width:100%;text-align:left" onclick="openForm('${type}')"><div class="ic" style="background:${c}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div><div class="ar">${I.ar}</div></button>`;}
+function pick(type,c,icon,t,s,action){return `<button class="pick" style="width:100%;text-align:left" onclick="${action||`openForm('${type}')`}"><div class="ic" style="background:${c}">${icon}</div><div><div class="t">${t}</div><div class="s">${s}</div></div><div class="ar">${I.ar}</div></button>`;}
 
 let formType='sick';
 function openForm(group){
